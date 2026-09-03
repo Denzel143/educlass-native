@@ -80,6 +80,19 @@
         }
         button:focus { outline: none; }
         button:active { transform: scale(0.95); }
+        button:disabled { opacity: 0.55; cursor: default; }
+
+        /* Ikon SVG kustom di dalam tombol (menggantikan teks/emoji) */
+        button .ic { width: 19px; height: 19px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: block; pointer-events: none; }
+        button .ic.ic-filled { fill: currentColor; stroke: none; }
+        button.icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        button.icon-btn .ic-badge { font-size: 0.85em; font-weight: 700; line-height: 1; }
+        /* Tombol yang tadinya lebar penuh teks kini jadi bulat/kompak berisi ikon saja */
+        button.icon-btn.icon-only { width: 46px; height: 46px; padding: 0; border-radius: 50%; }
+        button.icon-btn.icon-only.icon-only-sm { width: 38px; height: 38px; }
+        button.icon-btn.icon-pill { border-radius: 99px; }
+        .fab-btn .ic { width: 26px; height: 26px; }
+        .btn-header-action.icon-btn { padding: 10px 14px; }
         
         input, textarea { 
             padding: 16px 20px; margin: 8px 0 20px 0; 
@@ -787,6 +800,8 @@
         }
         @media (hover: hover) and (pointer: fine) { .chat-toggle-btn:hover { filter: brightness(0.96); } }
         .chat-toggle-btn.active { background: var(--danger-light); color: var(--danger); }
+        #chat-toggle-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+        #chat-toggle-icon { display: flex; }
         #chat-disabled-banner {
             margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm);
             background: var(--danger-light); color: var(--danger); font-size: 12px; font-weight: 700;
@@ -1031,6 +1046,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
+    <!-- Sprite ikon SVG kustom (bukan emoji) yang dipakai ulang oleh tombol-tombol di halaman ini -->
+    <svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
+        <defs>
+            <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></symbol>
+            <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+            <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+            <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L18 10l-4-4L4 16v4z M14 6l4 4"/></symbol>
+            <symbol id="i-link" viewBox="0 0 24 24"><circle cx="8" cy="12" r="3"/><circle cx="16" cy="12" r="3"/><path d="M11 12h2"/></symbol>
+            <symbol id="i-send" viewBox="0 0 24 24"><path d="M3 11.5L21 3l-8.5 18-2-7.5L3 11.5z"/></symbol>
+            <symbol id="i-attach" viewBox="0 0 24 24"><path d="M17 8l-7.5 7.5a3 3 0 004.24 4.24L21 12.5a5 5 0 00-7.07-7.07L6.5 12.86"/></symbol>
+            <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17" cy="9" r="2.2"/><path d="M15.5 14.3c2.3.3 3.9 2.2 3.9 5.2"/></symbol>
+            <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+            <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+            <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+            <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 10v4h3l7 4V6l-7 4H3z"/><path d="M17 9a4 4 0 010 6"/></symbol>
+            <symbol id="i-task" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+            <symbol id="i-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle class="ic-filled" cx="8.5" cy="8.5" r="1.2"/><circle class="ic-filled" cx="15.5" cy="15.5" r="1.2"/><circle class="ic-filled" cx="15.5" cy="8.5" r="1.2"/><circle class="ic-filled" cx="8.5" cy="15.5" r="1.2"/><circle class="ic-filled" cx="12" cy="12" r="1.2"/></symbol>
+            <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l7.8-4.5M12 12L4.2 16.5M12 12L12 21"/></symbol>
+            <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M17 6h4v4M17 18h4v-4M3 18h4l4-5"/></symbol>
+            <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5.5 9a7 7 0 0112-4.3L20 7M18.5 15a7 7 0 01-12 4.3L4 17"/></symbol>
+            <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7V5z"/></symbol>
+            <symbol id="i-person-add" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.5-5.5 6-5.5s6 2.2 6 5.5"/><path d="M18 8v6M15 11h6"/></symbol>
+            <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+            <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V5M7 9l5-5 5 5"/><path d="M4 20h16"/></symbol>
+            <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2c-3.3 0-5.5 2.3-5.5 5.3 0 3.6 5.5 10.7 5.5 10.7s5.5-7.1 5.5-10.7C17.5 4.3 15.3 2 12 2z"/><circle cx="12" cy="7.3" r="2"/></symbol>
+            <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5.5 5.5M21.5 9L16 14.5"/></symbol>
+            <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></symbol>
+            <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 017.8-1.5"/></symbol>
+            <symbol id="i-ai" viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="10" rx="2"/><circle class="ic-filled" cx="9.3" cy="13" r="1.3"/><circle class="ic-filled" cx="14.7" cy="13" r="1.3"/><path d="M12 8V4"/><circle class="ic-filled" cx="12" cy="3" r="1.2"/></symbol>
+            <symbol id="i-dots" viewBox="0 0 24 24"><circle class="ic-filled" cx="12" cy="5" r="1.6"/><circle class="ic-filled" cx="12" cy="12" r="1.6"/><circle class="ic-filled" cx="12" cy="19" r="1.6"/></symbol>
+            <symbol id="i-comment" viewBox="0 0 24 24"><path d="M21 14a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4v7z"/></symbol>
+            <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></symbol>
+            <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+        </defs>
+    </svg>
 
     <div id="global-loading">
         <div class="spinner"></div>
@@ -1040,7 +1091,7 @@
 
     <header id="main-header" class="hidden">
         <h2 id="logo-home" style="cursor:pointer;" title="Kembali ke Dashboard">EduClass</h2>
-        <button id="btn-logout">Logout</button>
+        <button id="btn-logout" class="icon-btn"><svg class="ic"><use href="#i-logout"></use></svg></button>
     </header>
 
     <div id="custom-alert-overlay" class="modal-overlay hidden">
@@ -1048,7 +1099,7 @@
             <h3 style="color: var(--primary);">Informasi</h3>
             <p id="custom-alert-message" style="word-wrap: break-word; user-select: text;"></p>
             <div class="modal-actions center">
-                <button id="custom-alert-btn" class="btn-buat" style="width: 100%;">Tutup</button>
+                <button id="custom-alert-btn" class="icon-btn btn-buat" style="width: 100%;"><svg class="ic"><use href="#i-check"></use></svg></button>
             </div>
         </div>
     </div>
@@ -1058,8 +1109,8 @@
             <h3 style="color: var(--danger);">Konfirmasi</h3>
             <p id="custom-confirm-message"></p>
             <div class="modal-actions center" style="flex-direction: column-reverse; gap: 10px;">
-                <button id="custom-confirm-cancel" class="btn-batal" style="width: 100%;">Batal</button>
-                <button id="custom-confirm-ok" class="btn-bahaya" style="width: 100%;">Ya, Lanjutkan</button>
+                <button id="custom-confirm-cancel" class="icon-btn btn-batal" style="width: 100%;"><svg class="ic"><use href="#i-close"></use></svg></button>
+                <button id="custom-confirm-ok" class="icon-btn btn-bahaya" style="width: 100%;"><svg class="ic"><use href="#i-check"></use></svg></button>
             </div>
         </div>
     </div>
@@ -1088,15 +1139,15 @@
             <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 1.4rem;">Daftar Kelas Anda</h3>
             <div id="guru-class-list" class="card-list"></div>
             
-            <button class="fab-btn" id="btn-show-guru-options" title="Opsi Kelas">+</button>
+            <button class="fab-btn" id="btn-show-guru-options" title="Opsi Kelas"><svg class="ic"><use href="#i-plus"></use></svg></button>
 
             <div id="guru-fab-choice-modal" class="modal-overlay hidden">
                 <div class="modal-card alert-card">
                     <h3 style="color: var(--primary); margin-top:0;">Menu Kelas</h3>
                     <div class="modal-actions center" style="flex-direction: column; gap: 12px; margin-top:20px;">
-                        <button id="btn-choice-buat" class="btn-buat" style="width: 100%; padding:16px;">+ Buat Kelas Baru</button>
-                        <button id="btn-choice-gabung" class="btn-outline" style="width: 100%; padding:16px;">Gabung via Kode Kelas</button>
-                        <button id="btn-choice-batal" class="btn-batal" style="width: 100%; margin-top: 10px;">Tutup</button>
+                        <button id="btn-choice-buat" class="icon-btn btn-buat" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-plus"></use></svg></button>
+                        <button id="btn-choice-gabung" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-link"></use></svg></button>
+                        <button id="btn-choice-batal" class="icon-btn btn-batal" style="width: 100%; margin-top: 10px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1112,8 +1163,8 @@
                     <label style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; display: block;">Siswa Terpilih:</label>
                     <div id="selected-students" class="selected-box"></div>
                     <div class="modal-actions">
-                        <button id="btn-batal-class" class="btn-batal">Batal</button>
-                        <button id="btn-buat-class" class="btn-buat">Buat Kelas</button>
+                        <button id="btn-batal-class" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-buat-class" class="icon-btn btn-buat"><svg class="ic"><use href="#i-check"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1123,7 +1174,7 @@
             <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 1.4rem;">Kelas Saya</h3>
             <div id="siswa-class-list" class="card-list"></div>
 
-            <button class="fab-btn" id="btn-show-join-modal-siswa" title="Gabung Kelas via Kode">+</button>
+            <button class="fab-btn" id="btn-show-join-modal-siswa" title="Gabung Kelas via Kode"><svg class="ic"><use href="#i-plus"></use></svg></button>
         </div>
 
         <div id="join-class-modal-overlay" class="modal-overlay hidden">
@@ -1133,8 +1184,8 @@
                 <label>Kode Kelas</label>
                 <input type="text" id="input-class-code" placeholder="Misal: -NxpYt5..." autocomplete="off">
                 <div class="modal-actions">
-                    <button id="btn-batal-join" class="btn-batal">Batal</button>
-                    <button id="btn-join-class" class="btn-buat">Gabung</button>
+                    <button id="btn-batal-join" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                    <button id="btn-join-class" class="icon-btn btn-buat"><svg class="ic"><use href="#i-link"></use></svg></button>
                 </div>
             </div>
         </div>
@@ -1151,13 +1202,13 @@
                 <h4>📅 Kalender</h4>
             </div>
             <div class="calendar-nav">
-                <button id="btn-cal-prev">&lsaquo;</button>
+                <button id="btn-cal-prev" class="icon-btn"><svg class="ic"><use href="#i-chevron-left"></use></svg></button>
                 <div class="calendar-month-label" id="calendar-month-label"></div>
-                <button id="btn-cal-next">&rsaquo;</button>
+                <button id="btn-cal-next" class="icon-btn"><svg class="ic"><use href="#i-chevron-right"></use></svg></button>
             </div>
             <div class="calendar-grid" id="calendar-grid"></div>
             <div id="calendar-task-list" class="calendar-task-list"></div>
-            <button class="btn-cal-today" id="btn-cal-today">Hari Ini</button>
+            <button class="icon-btn btn-cal-today" id="btn-cal-today"><svg class="ic"><use href="#i-calendar"></use></svg></button>
         </div>
     </div>
 
@@ -1185,7 +1236,7 @@
             <div class="chat-sidebar-header-row">
                 <h4>💬 Obrolan Kelas</h4>
                 <button id="btn-toggle-chat-disabled" class="chat-toggle-btn hidden" type="button" title="Matikan obrolan sementara">
-                    <span id="chat-toggle-icon">🔓</span>
+                    <span id="chat-toggle-icon"><svg class="ic"><use href="#i-unlock"></use></svg></span>
                     <span id="chat-toggle-label">Obrolan Aktif</span>
                 </button>
             </div>
@@ -1193,18 +1244,18 @@
             <div id="eduai-session-timer" class="hidden" title="Sisa waktu sesi memori EduAI">
                 <span class="eduai-timer-dot"></span>
                 <span id="eduai-session-timer-label">EduAI 15:00</span>
-                <button id="btn-eduai-end-session" type="button" title="Akhiri sesi EduAI sekarang">Akhiri</button>
+                <button id="btn-eduai-end-session" type="button" title="Akhiri sesi EduAI sekarang" class="icon-btn"><svg class="ic"><use href="#i-stop"></use></svg></button>
             </div>
         </div>
         <div id="chat-messages-container"></div>
         <div class="chat-input-area">
             <div id="chat-edit-indicator" class="comment-reply-indicator hidden">
                 <span>✏️ Sedang mengedit pesan</span>
-                <button id="btn-cancel-chat-edit" type="button" title="Batal mengedit">✕</button>
+                <button id="btn-cancel-chat-edit" type="button" title="Batal mengedit" class="icon-btn"><svg class="ic"><use href="#i-close"></use></svg></button>
             </div>
             <div id="chat-reply-indicator" class="comment-reply-indicator hidden">
                 <span>Membalas <strong id="chat-reply-name"></strong></span>
-                <button id="btn-cancel-chat-reply" type="button" title="Batal membalas">✕</button>
+                <button id="btn-cancel-chat-reply" type="button" title="Batal membalas" class="icon-btn"><svg class="ic"><use href="#i-close"></use></svg></button>
             </div>
             <div id="chat-attach-preview" class="chat-attach-preview hidden"></div>
             <div id="eduai-suggest-popup" class="eduai-suggest-popup hidden">
@@ -1218,8 +1269,8 @@
             </div>
             <div style="display:flex; gap:8px; align-items:flex-end;">
                 <textarea id="input-chat" rows="1" placeholder="Tulis pesan..." style="margin:0; flex-grow:1;"></textarea>
-                <button id="btn-attach-chat" type="button" class="btn-chat-attach-icon" title="Lampirkan materi/pengumuman">📎</button>
-                <button id="btn-kirim-chat" class="btn-buat" style="margin:0; white-space:nowrap;">Kirim</button>
+                <button id="btn-attach-chat" type="button" class="icon-btn btn-chat-attach-icon" title="Lampirkan materi/pengumuman"><svg class="ic"><use href="#i-attach"></use></svg></button>
+                <button id="btn-kirim-chat" class="icon-btn btn-buat" style="margin:0; white-space:nowrap;"><svg class="ic"><use href="#i-send"></use></svg></button>
             </div>
         </div>
     </div>
@@ -1234,7 +1285,7 @@
         <div class="modal-card" style="height: 70vh;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 style="margin:0; color:var(--primary);">Lampirkan Materi</h3>
-                <button id="btn-close-chat-attach-picker" class="btn-batal" style="padding: 8px 16px; border-radius: 99px;">Tutup</button>
+                <button id="btn-close-chat-attach-picker" class="icon-btn btn-batal" style="padding: 8px 16px; border-radius: 99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
             </div>
             <div id="chat-attach-picker-list" style="flex-grow:1; overflow-y:auto; padding-right:5px; display:flex; flex-direction:column; gap:10px;"></div>
         </div>
@@ -1250,10 +1301,10 @@
             <p style="font-size:14px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px;">Salin kode unik di bawah ini dan bagikan kepada siswa atau rekan guru agar bisa bergabung.</p>
             <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
                 <input type="text" id="share-code-input" readonly style="margin:0; font-size:1.1rem; font-weight:700; text-align:center; letter-spacing:1px; background:var(--primary-light); color:var(--primary);">
-                <button id="btn-copy-code" class="btn-buat" style="margin:0; white-space:nowrap; padding: 16px 20px;">Salin Kode</button>
+                <button id="btn-copy-code" class="icon-btn btn-buat" style="margin:0; white-space:nowrap; padding: 16px 20px;"><svg class="ic"><use href="#i-link"></use></svg></button>
             </div>
             <div class="modal-actions center">
-                <button id="btn-close-share" class="btn-batal" style="width: 100%;">Tutup</button>
+                <button id="btn-close-share" class="icon-btn btn-batal" style="width: 100%;"><svg class="ic"><use href="#i-close"></use></svg></button>
             </div>
         </div>
     </div>
@@ -1264,8 +1315,8 @@
             <label>Nama Kelas Baru</label>
             <input type="text" id="input-edit-class-name" placeholder="Masukkan nama kelas...">
             <div class="modal-actions">
-                <button id="btn-batal-edit-class" class="btn-batal">Batal</button>
-                <button id="btn-simpan-edit-class" class="btn-buat">Simpan</button>
+                <button id="btn-batal-edit-class" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                <button id="btn-simpan-edit-class" class="icon-btn btn-buat"><svg class="ic"><use href="#i-check"></use></svg></button>
             </div>
         </div>
     </div>
@@ -1273,7 +1324,7 @@
     <div id="class-room-section" class="container hidden">
         <div id="class-detail-section">
             <div style="display:flex; gap:12px; flex-wrap: wrap; margin-bottom: 20px;">
-                <button class="btn-batal" id="btn-lihat-anggota" style="background:var(--primary-light); color:var(--primary); font-weight: 700; border-radius: 99px; padding: 10px 20px;">👥 Anggota Kelas (<span id="member-count-display">0</span>)</button>
+                <button class="btn-batal icon-btn icon-pill" id="btn-lihat-anggota" title="Anggota Kelas" style="background:var(--primary-light); color:var(--primary); font-weight: 700; border-radius: 99px; padding: 10px 20px;"><svg class="ic"><use href="#i-people"></use></svg><span class="ic-badge" id="member-count-display">0</span></button>
             </div>
             
             <div class="class-header">
@@ -1282,13 +1333,13 @@
                     <p id="room-class-teacher">Guru: ...</p>
                 </div>
                 <div class="header-actions">
-                    <button id="btn-bagikan-kelas" class="btn-header-action">🔗 Bagikan Kode</button>
-                    <button id="btn-edit-kelas" class="btn-header-action hidden">✏️ Edit Nama</button>
-                    <button id="btn-hapus-kelas" class="btn-header-action hidden">Hapus Kelas</button>
+                    <button id="btn-bagikan-kelas" class="icon-btn btn-header-action"><svg class="ic"><use href="#i-link"></use></svg></button>
+                    <button id="btn-edit-kelas" class="icon-btn btn-header-action hidden"><svg class="ic"><use href="#i-edit"></use></svg></button>
+                    <button id="btn-hapus-kelas" class="icon-btn btn-header-action hidden"><svg class="ic"><use href="#i-trash"></use></svg></button>
                 </div>
             </div>
 
-            <button class="fab-btn hidden" id="btn-show-announcement-modal" title="Buat Pengumuman Baru">+</button>
+            <button class="fab-btn hidden" id="btn-show-announcement-modal" title="Buat Pengumuman Baru"><svg class="ic"><use href="#i-plus"></use></svg></button>
 
             <div id="announcement-modal-overlay" class="modal-overlay hidden">
                 <div class="modal-card">
@@ -1296,7 +1347,7 @@
                     <textarea id="input-announcement" rows="6" placeholder="Ketik pengumuman, tugas, atau materi di sini..."></textarea>
 
                     <input type="file" id="input-announcement-file" class="hidden" multiple>
-                    <button type="button" id="btn-attach-file" class="btn-attach-file">📎 Lampirkan File</button>
+                    <button type="button" id="btn-attach-file" class="icon-btn btn-attach-file"><svg class="ic"><use href="#i-attach"></use></svg></button>
                     <p style="font-size: 11px; color: var(--text-muted); margin: 6px 0 0 4px;">Maks 10 file, total 50 MB per materi.</p>
                     <div id="attach-file-list" class="attach-file-list hidden"></div>
                     <div id="attach-upload-progress" class="attach-upload-progress-wrap hidden">
@@ -1305,8 +1356,8 @@
                     </div>
 
                     <div class="modal-actions">
-                        <button id="btn-batal-announcement" class="btn-batal">Batal</button>
-                        <button id="btn-post-announcement" class="btn-buat">Posting</button>
+                        <button id="btn-batal-announcement" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-post-announcement" class="icon-btn btn-buat"><svg class="ic"><use href="#i-send"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1316,11 +1367,11 @@
                 <div class="modal-card alert-card">
                     <h3 style="color: var(--primary); margin-top:0;">Menu Guru</h3>
                     <div class="modal-actions center" style="flex-direction: column; gap: 12px; margin-top:20px;">
-                        <button id="btn-choice-pengumuman" class="btn-buat" style="width: 100%; padding:16px;">📢 Buat Pengumuman</button>
-                        <button id="btn-choice-task" class="btn-outline" style="width: 100%; padding:16px;">📝 Buat Tugas</button>
-                        <button id="btn-choice-team-generator" class="btn-outline" style="width: 100%; padding:16px;">🎲 Random Team Generator</button>
-                        <button id="btn-choice-random-picker" class="btn-outline" style="width: 100%; padding:16px;">🎡 Random Picker</button>
-                        <button id="btn-choice-teacher-batal" class="btn-batal" style="width: 100%; margin-top: 10px;">Tutup</button>
+                        <button id="btn-choice-pengumuman" class="icon-btn btn-buat" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-megaphone"></use></svg></button>
+                        <button id="btn-choice-task" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-task"></use></svg></button>
+                        <button id="btn-choice-team-generator" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-dice"></use></svg></button>
+                        <button id="btn-choice-random-picker" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-wheel"></use></svg></button>
+                        <button id="btn-choice-teacher-batal" class="icon-btn btn-batal" style="width: 100%; margin-top: 10px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1340,8 +1391,8 @@
                         </label>
                     </div>
                     <div class="modal-actions">
-                        <button id="btn-batal-team-gen" class="btn-batal">Batal</button>
-                        <button id="btn-generate-team" class="btn-buat">Acak Sekarang</button>
+                        <button id="btn-batal-team-gen" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-generate-team" class="icon-btn btn-buat"><svg class="ic"><use href="#i-shuffle"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1350,13 +1401,13 @@
                 <div class="modal-card" style="height: 80vh;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                         <h3 style="margin:0; color:var(--primary);">Hasil Pembagian Kelompok</h3>
-                        <button id="btn-close-team-result-x" class="btn-batal" style="padding: 8px 16px; border-radius: 99px;">Tutup</button>
+                        <button id="btn-close-team-result-x" class="icon-btn btn-batal" style="padding: 8px 16px; border-radius: 99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                     <div id="team-result-list" style="flex-grow:1; overflow-y:auto; padding-right:5px;"></div>
                     <div class="modal-actions">
-                        <button id="btn-batal-team-result" class="btn-batal">Batal</button>
-                        <button id="btn-reroll-team" class="btn-outline">Acak Ulang</button>
-                        <button id="btn-post-team-result" class="btn-buat">Posting</button>
+                        <button id="btn-batal-team-result" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-reroll-team" class="icon-btn btn-outline"><svg class="ic"><use href="#i-refresh"></use></svg></button>
+                        <button id="btn-post-team-result" class="icon-btn btn-buat"><svg class="ic"><use href="#i-send"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1366,7 +1417,7 @@
                 <div class="modal-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <h3 style="margin:0; color:var(--primary);">🎡 Random Picker</h3>
-                        <button id="btn-close-random-picker" class="btn-batal" style="padding: 8px 16px; border-radius: 99px;">Tutup</button>
+                        <button id="btn-close-random-picker" class="icon-btn btn-batal" style="padding: 8px 16px; border-radius: 99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                     <div class="picker-layout">
                         <div class="picker-wheel-col">
@@ -1376,13 +1427,13 @@
                                     <g id="picker-wheel-group" style="transform-origin: 150px 150px;"></g>
                                 </svg>
                                 <div id="picker-wheel-empty">Tambahkan minimal 2 pilihan di kolom sebelah untuk mulai memutar roda</div>
-                                <button id="btn-spin-wheel" type="button" disabled>PUTAR</button>
+                                <button id="btn-spin-wheel" class="icon-btn" type="button" title="Putar" disabled><svg class="ic" style="width:26px;height:26px;"><use href="#i-play"></use></svg></button>
                             </div>
                         </div>
                         <div class="picker-input-col">
                             <label>Daftar Pilihan (pisahkan dengan Enter)</label>
                             <textarea id="input-picker-list" placeholder="Contoh:&#10;Budi&#10;Siti&#10;Andi"></textarea>
-                            <button type="button" id="btn-autofill-students" class="btn-outline" style="width:100%;">👥 Isi Otomatis dengan Siswa</button>
+                            <button type="button" id="btn-autofill-students" class="icon-btn btn-outline" style="width:100%;"><svg class="ic"><use href="#i-people"></use></svg></button>
                         </div>
                     </div>
                 </div>
@@ -1393,9 +1444,9 @@
                     <h3 style="margin-top:0; color:var(--primary);">🎉 Terpilih!</h3>
                     <div class="picker-result-name" id="picker-result-name"></div>
                     <div class="modal-actions center" style="flex-direction: column; gap: 12px; margin-top:10px;">
-                        <button id="btn-picker-mark" class="btn-buat" style="width: 100%; padding:16px;">✅ Tandai</button>
-                        <button id="btn-picker-remove" class="btn-bahaya" style="width: 100%; padding:16px;">🗑️ Hapus dari Daftar</button>
-                        <button id="btn-picker-close-result" class="btn-batal" style="width: 100%; margin-top: 6px;">Tutup Hasil</button>
+                        <button id="btn-picker-mark" class="icon-btn btn-buat" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-check"></use></svg></button>
+                        <button id="btn-picker-remove" class="icon-btn btn-bahaya" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-trash"></use></svg></button>
+                        <button id="btn-picker-close-result" class="icon-btn btn-batal" style="width: 100%; margin-top: 6px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1411,7 +1462,7 @@
                     <textarea id="input-edit-announcement" rows="6"></textarea>
 
                     <input type="file" id="input-edit-announcement-file" class="hidden" multiple>
-                    <button type="button" id="btn-edit-attach-file" class="btn-attach-file">📎 Tambah File</button>
+                    <button type="button" id="btn-edit-attach-file" class="icon-btn btn-attach-file"><svg class="ic"><use href="#i-attach"></use></svg></button>
                     <p style="font-size: 11px; color: var(--text-muted); margin: 6px 0 0 4px;">Maks 10 file, total 50 MB per materi (file lama ikut dihitung).</p>
                     <div id="edit-attach-file-list" class="attach-file-list hidden"></div>
                     <div id="edit-attach-upload-progress" class="attach-upload-progress-wrap hidden">
@@ -1420,8 +1471,8 @@
                     </div>
 
                     <div class="modal-actions">
-                        <button id="btn-batal-edit" class="btn-batal">Batal</button>
-                        <button id="btn-simpan-edit" class="btn-buat">Simpan</button>
+                        <button id="btn-batal-edit" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-simpan-edit" class="icon-btn btn-buat"><svg class="ic"><use href="#i-check"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1430,10 +1481,10 @@
                 <div class="modal-card" style="height: 80vh;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                         <h3 style="margin:0; color:var(--primary);">Anggota Kelas</h3>
-                        <button id="btn-close-members" class="btn-batal" style="padding: 8px 16px; border-radius: 99px;">Tutup</button>
+                        <button id="btn-close-members" class="icon-btn btn-batal" style="padding: 8px 16px; border-radius: 99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                     
-                    <button id="btn-buka-undang-anggota" class="btn-buat hidden" style="width:100%; margin-bottom: 20px; padding: 14px;">+ Undang Anggota</button>
+                    <button id="btn-buka-undang-anggota" class="btn-buat icon-btn hidden" title="Undang Anggota" style="width:100%; margin-bottom: 20px; padding: 14px;"><svg class="ic"><use href="#i-person-add"></use></svg></button>
                     
                     <div id="members-list-container" style="flex-grow: 1; overflow-y: auto; padding-right: 5px;">
                         </div>
@@ -1447,7 +1498,7 @@
                     <input type="text" id="input-search-invite" placeholder="Cari username..." autocomplete="off">
                     <div id="invite-search-results" class="search-results-box hidden"></div>
                     <div class="modal-actions">
-                        <button id="btn-batal-invite" class="btn-batal" style="width: 100%;">Tutup</button>
+                        <button id="btn-batal-invite" class="icon-btn btn-batal" style="width: 100%;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1467,7 +1518,7 @@
                     <label>Deskripsi Tugas / Perintah</label>
                     <textarea id="input-task-description" rows="6" placeholder="Tuliskan instruksi tugas untuk siswa..."></textarea>
                     <input type="file" id="input-task-file" class="hidden" multiple>
-                    <button type="button" id="btn-task-attach-file" class="btn-attach-file">📎 Lampirkan File</button>
+                    <button type="button" id="btn-task-attach-file" class="icon-btn btn-attach-file"><svg class="ic"><use href="#i-attach"></use></svg></button>
                     <p class="task-criteria">Maksimal 5 file, total 20 MB per tugas. Aturan file mengikuti lampiran materi.</p>
                     <div id="task-file-list" class="attach-file-list hidden"></div>
                     <div class="switch-row">
@@ -1486,8 +1537,8 @@
                         <div class="attach-upload-bar-bg"><div class="attach-upload-bar-fill" id="task-upload-bar-fill"></div></div>
                     </div>
                     <div class="modal-actions">
-                        <button id="btn-batal-task" class="btn-batal">Batal</button>
-                        <button id="btn-post-task" class="btn-buat">Posting</button>
+                        <button id="btn-batal-task" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-post-task" class="icon-btn btn-buat"><svg class="ic"><use href="#i-send"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1498,7 +1549,7 @@
                     <label>Deskripsi Tugas / Perintah</label>
                     <textarea id="input-edit-task-description" rows="6"></textarea>
                     <input type="file" id="input-edit-task-file" class="hidden" multiple>
-                    <button type="button" id="btn-edit-task-attach-file" class="btn-attach-file">📎 Tambah File</button>
+                    <button type="button" id="btn-edit-task-attach-file" class="icon-btn btn-attach-file"><svg class="ic"><use href="#i-attach"></use></svg></button>
                     <p class="task-criteria">Maksimal 5 file, total 20 MB per tugas (file lama ikut dihitung).</p>
                     <div id="edit-task-file-list" class="attach-file-list hidden"></div>
                     <div class="switch-row">
@@ -1512,10 +1563,10 @@
                         <input type="time" id="input-edit-task-deadline-time">
                     </div>
                     <div class="modal-actions" style="justify-content:space-between;">
-                        <button id="btn-hapus-task" class="btn-bahaya">Hapus Tugas</button>
+                        <button id="btn-hapus-task" class="icon-btn btn-bahaya"><svg class="ic"><use href="#i-trash"></use></svg></button>
                         <div style="display:flex; gap:12px;">
-                            <button id="btn-batal-edit-task" class="btn-batal">Batal</button>
-                            <button id="btn-simpan-edit-task" class="btn-buat">Simpan</button>
+                            <button id="btn-batal-edit-task" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                            <button id="btn-simpan-edit-task" class="icon-btn btn-buat"><svg class="ic"><use href="#i-check"></use></svg></button>
                         </div>
                     </div>
                 </div>
@@ -1525,13 +1576,13 @@
                 <div class="modal-card" style="max-width:620px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;">
                         <h3 id="task-submission-modal-title" style="margin:0; color:var(--primary);">Unggahan Tugas</h3>
-                        <button id="btn-close-task-submission" class="btn-batal" style="padding:8px 16px; border-radius:99px;">Tutup</button>
+                        <button id="btn-close-task-submission" class="icon-btn btn-batal" style="padding:8px 16px; border-radius:99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                     <div id="task-submission-info" style="font-size:13px; color:var(--text-muted); line-height:1.5;"></div>
                     <div id="student-task-upload-panel" class="task-upload-section hidden">
                         <div class="task-upload-picker">
-                            <button type="button" id="btn-student-add-file">📎 Tambah File</button>
-                            <button type="button" id="btn-student-add-url">🔗 Tambah URL</button>
+                            <button type="button" id="btn-student-add-file" class="icon-btn"><svg class="ic"><use href="#i-attach"></use></svg></button>
+                            <button type="button" id="btn-student-add-url" class="icon-btn"><svg class="ic"><use href="#i-link"></use></svg></button>
                         </div>
                         <input type="file" id="input-student-task-file" class="hidden" multiple>
                         <div id="student-task-file-list" class="task-file-preview-list"></div>
@@ -1542,7 +1593,7 @@
                             <div class="attach-upload-bar-bg"><div class="attach-upload-bar-fill" id="student-task-progress-bar"></div></div>
                         </div>
                         <div class="modal-actions">
-                            <button id="btn-student-send-task" class="btn-buat">Kirim</button>
+                            <button id="btn-student-send-task" class="icon-btn btn-buat"><svg class="ic"><use href="#i-send"></use></svg></button>
                         </div>
                     </div>
                     <div id="student-task-viewonly-panel" class="hidden">
@@ -1563,14 +1614,14 @@
                 <div class="modal-card" style="max-width:460px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                         <h3 style="margin:0; color:var(--primary);">🔗 Tambah URL</h3>
-                        <button id="btn-close-task-url" class="btn-batal" style="padding:8px 16px; border-radius:99px;">Tutup</button>
+                        <button id="btn-close-task-url" class="icon-btn btn-batal" style="padding:8px 16px; border-radius:99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                     <label>URL</label>
                     <input type="url" id="input-task-url" placeholder="https://contoh.com/..." autocomplete="url">
                     <p class="task-criteria">Gunakan URL lengkap dengan http:// atau https://. Maksimal 5 URL.</p>
                     <div class="modal-actions">
-                        <button id="btn-cancel-task-url" class="btn-batal">Batal</button>
-                        <button id="btn-save-task-url" class="btn-buat">Tambahkan</button>
+                        <button id="btn-cancel-task-url" class="icon-btn btn-batal"><svg class="ic"><use href="#i-close"></use></svg></button>
+                        <button id="btn-save-task-url" class="icon-btn btn-buat"><svg class="ic"><use href="#i-check"></use></svg></button>
                     </div>
                 </div>
             </div>
@@ -1579,7 +1630,7 @@
                 <div class="modal-card" style="max-width: 600px; height: 82vh;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                         <h3 style="margin:0; color:var(--primary);">Komentar</h3>
-                        <button id="btn-close-comments" class="btn-batal" style="padding: 8px 16px; border-radius: 99px;">Tutup</button>
+                        <button id="btn-close-comments" class="icon-btn btn-batal" style="padding: 8px 16px; border-radius: 99px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
 
                     <div id="comment-thread-container"></div>
@@ -1587,15 +1638,15 @@
                     <div style="margin-top: 14px;">
                         <div id="comment-edit-indicator" class="comment-reply-indicator hidden">
                             <span>✏️ Sedang mengedit komentar</span>
-                            <button id="btn-cancel-comment-edit" type="button" title="Batal mengedit">✕</button>
+                            <button id="btn-cancel-comment-edit" type="button" title="Batal mengedit" class="icon-btn"><svg class="ic"><use href="#i-close"></use></svg></button>
                         </div>
                         <div id="comment-reply-indicator" class="comment-reply-indicator hidden">
                             <span>Membalas <strong id="comment-reply-name"></strong></span>
-                            <button id="btn-cancel-reply" type="button" title="Batal membalas">✕</button>
+                            <button id="btn-cancel-reply" type="button" title="Batal membalas" class="icon-btn"><svg class="ic"><use href="#i-close"></use></svg></button>
                         </div>
                         <div id="comment-input-row" style="display:flex; gap:10px; align-items:flex-end;">
                             <textarea id="input-comment" rows="2" placeholder="Tulis komentar..." style="margin:0; flex-grow:1;"></textarea>
-                            <button id="btn-kirim-komentar" class="btn-buat" style="margin:0; white-space:nowrap;">Kirim</button>
+                            <button id="btn-kirim-komentar" class="icon-btn btn-buat" style="margin:0; white-space:nowrap;"><svg class="ic"><use href="#i-send"></use></svg></button>
                         </div>
                         <p id="comment-locked-msg" class="hidden" style="text-align:center; color:var(--text-muted); font-size:13px; padding:10px 0; margin:0;">🔒 Anda tidak dapat berkomentar pada materi ini.</p>
                     </div>
@@ -2329,7 +2380,7 @@
             document.getElementById('chat-attach-preview').classList.add('hidden');
             document.getElementById('chat-attach-preview').innerHTML = '';
             document.getElementById('input-chat').value = '';
-            document.getElementById('btn-kirim-chat').innerText = 'Kirim';
+            document.getElementById('btn-kirim-chat').innerHTML = '<svg class="ic"><use href="#i-send"></use></svg>';
             document.getElementById('btn-toggle-chat-disabled').classList.add('hidden');
             updateChatDisabledUI(false, false);
             
@@ -2476,7 +2527,9 @@
             const btnAttach = document.getElementById('btn-attach-chat');
 
             btnToggleChat.classList.toggle('active', chatDisabled);
-            toggleIcon.innerText = chatDisabled ? '🔒' : '🔓';
+            toggleIcon.innerHTML = chatDisabled
+                ? '<svg class="ic"><use href="#i-lock"></use></svg>'
+                : '<svg class="ic"><use href="#i-unlock"></use></svg>';
             toggleLabel.innerText = chatDisabled ? 'Obrolan Nonaktif' : 'Obrolan Aktif';
             btnToggleChat.title = chatDisabled ? 'Aktifkan kembali obrolan' : 'Matikan obrolan sementara';
 
@@ -2680,7 +2733,7 @@
             const canReply = !isDeleted && !isAiSender;
             const showMenu = canEdit || canDeleteSelf || canDeleteAsTeacher || canReply;
             const menuBtn = showMenu
-                ? `<button class="chat-menu-btn" data-id="${id}" data-owner="${canEdit}" data-delete="${canDeleteSelf || canDeleteAsTeacher}" data-reply="${canReply}">⋮</button>`
+                ? `<button class="chat-menu-btn" data-id="${id}" data-owner="${canEdit}" data-delete="${canDeleteSelf || canDeleteAsTeacher}" data-reply="${canReply}" title="Opsi pesan"><svg class="ic"><use href="#i-dots"></use></svg></button>`
                 : '';
 
             return `
@@ -3128,7 +3181,7 @@
                         <div class="chat-attach-preview-snippet">${escapeHtml(preview || '(Tanpa teks, ada lampiran file)')}</div>
                     </div>
                 </div>
-                <button id="btn-cancel-chat-attach" type="button" title="Batalkan lampiran">✕</button>
+                <button id="btn-cancel-chat-attach" class="icon-btn" type="button" title="Batalkan lampiran"><svg class="ic"><use href="#i-close"></use></svg></button>
             `;
             box.classList.remove('hidden');
         }
@@ -3263,14 +3316,14 @@
             if (!editingChatMessageId) stashChatComposerState(); // simpan draft/balasan/lampiran lama sekali saja
             editingChatMessageId = id;
             document.getElementById('input-chat').value = text || '';
-            document.getElementById('btn-kirim-chat').innerText = 'Simpan';
+            document.getElementById('btn-kirim-chat').innerHTML = '<svg class="ic"><use href="#i-check"></use></svg>';
             showChatEditIndicator();
             document.getElementById('input-chat').focus();
         }
 
         function exitChatEditMode() {
             editingChatMessageId = null;
-            document.getElementById('btn-kirim-chat').innerText = 'Kirim';
+            document.getElementById('btn-kirim-chat').innerHTML = '<svg class="ic"><use href="#i-send"></use></svg>';
             hideChatEditIndicator();
             restoreChatComposerState();
         }
@@ -3416,13 +3469,11 @@
             
             const btn = document.getElementById('btn-simpan-edit-class');
             btn.disabled = true;
-            btn.innerText = "Menyimpan...";
             
             await update(ref(db, `classes/${currentViewedClassId}`), { className: newName });
             
             document.getElementById('edit-class-modal-overlay').classList.add('hidden');
             btn.disabled = false;
-            btn.innerText = "Simpan";
             await customAlert("Nama kelas berhasil diubah!");
         });
 
@@ -3522,7 +3573,7 @@
             if (!className) return await customAlert("Nama kelas tidak boleh kosong!");
             
             const btn = document.getElementById('btn-buat-class');
-            btn.disabled = true; btn.innerText = "Membuat...";
+            btn.disabled = true;
 
             const classRef = push(ref(db, 'classes'));
             const classData = {
@@ -3540,7 +3591,7 @@
             await Promise.all(promises);
 
             document.getElementById('class-modal-overlay').classList.add('hidden');
-            btn.disabled = false; btn.innerText = "Buat Kelas";
+            btn.disabled = false;
             await customAlert("Kelas berhasil dibuat dan undangan telah dikirim!");
         });
 
@@ -3595,8 +3646,8 @@
             const input = document.getElementById('share-code-input');
             input.select(); input.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(input.value);
-            document.getElementById('btn-copy-code').innerText = "Tersalin!";
-            setTimeout(() => document.getElementById('btn-copy-code').innerText = "Salin Kode", 2000);
+            document.getElementById('btn-copy-code').innerHTML = '<svg class="ic"><use href="#i-check"></use></svg>';
+            setTimeout(() => document.getElementById('btn-copy-code').innerHTML = '<svg class="ic"><use href="#i-link"></use></svg>', 2000);
         });
 
         document.getElementById('btn-hapus-kelas').addEventListener('click', async () => {
@@ -3637,7 +3688,7 @@
             if(!code) return await customAlert("Kode tidak boleh kosong!");
             
             const btn = document.getElementById('btn-join-class');
-            btn.disabled = true; btn.innerText = "Mengecek...";
+            btn.disabled = true;
             
             try {
                 const snap = await get(ref(db, `classes/${code}`));
@@ -3663,7 +3714,7 @@
                 console.error(e);
                 await customAlert("Terjadi kesalahan.");
             }
-            btn.disabled = false; btn.innerText = "Gabung";
+            btn.disabled = false;
         });
 
         function loadSiswaInvites() {
@@ -3682,8 +3733,8 @@
                                 <h4 style="margin:0 0 10px 0; font-size:1.1rem; color:var(--text-main); position:relative; z-index:1;">Anda diundang ke kelas: <span style="color:var(--primary); font-weight:700;">${data.className}</span></h4>
                                 <p style="margin:0 0 20px 0; font-size:14px; color:var(--text-muted); position:relative; z-index:1;">Oleh: ${data.teacherName}</p>
                                 <div style="display:flex; gap:12px; position:relative; z-index:1;">
-                                    <button class="btn-buat" onclick="terimaUndangan('${child.key}', '${data.classId}')">Terima Undangan</button>
-                                    <button class="btn-batal" onclick="tolakUndangan('${child.key}')">Tolak</button>
+                                    <button class="btn-buat icon-btn" title="Terima Undangan" onclick="terimaUndangan('${child.key}', '${data.classId}')"><svg class="ic"><use href="#i-check"></use></svg></button>
+                                    <button class="btn-batal icon-btn" title="Tolak" onclick="tolakUndangan('${child.key}')"><svg class="ic"><use href="#i-close"></use></svg></button>
                                 </div>
                             </div>
                         `;
@@ -3763,7 +3814,7 @@
                     const contributor = currentClassData.contributors[cId];
                     let removeBtn = '';
                     if(isTeacherOwnerForContrib) {
-                        removeBtn = `<button class="btn-hapus-announcement" style="padding:4px 8px;" onclick="keluarkanKontributor('${cId}', '${contributor.username}')">Keluarkan</button>`;
+                        removeBtn = `<button class="btn-hapus-announcement icon-btn" title="Keluarkan" style="padding:4px 8px;" onclick="keluarkanKontributor('${cId}', '${contributor.username}')"><svg class="ic"><use href="#i-trash"></use></svg></button>`;
                     }
                     c.innerHTML += `
                         <div class="result-item" style="cursor:default; border-radius: var(--radius-md); margin-bottom:5px;">
@@ -3792,12 +3843,12 @@
                         // manajemen keanggotaan), sedangkan kontrol posting/komentar boleh
                         // dilakukan kontributor juga.
                         const btnKeluarkan = isTeacherOwner
-                            ? `<button class="btn-hapus-announcement" style="padding:4px 8px;" onclick="keluarkanSiswa('${sId}', '${sName}')">Keluarkan</button>`
+                            ? `<button class="btn-hapus-announcement icon-btn" title="Keluarkan" style="padding:4px 8px;" onclick="keluarkanSiswa('${sId}', '${sName}')"><svg class="ic"><use href="#i-trash"></use></svg></button>`
                             : '';
                         actionsHtml = `
                             <div class="member-row-actions">
-                                <button class="btn-toggle-mini ${canPost ? 'active' : ''}" title="Izinkan siswa membuat pengumuman" onclick="toggleCanPost('${sId}', ${canPost})">📝 ${canPost ? 'Bisa Posting' : 'Izinkan Posting'}</button>
-                                <button class="btn-toggle-mini ${commentBlocked ? 'danger-active' : ''}" title="Blokir siswa dari berkomentar" onclick="toggleCommentBlocked('${sId}', ${commentBlocked})">${commentBlocked ? '🔇 Komentar Diblokir' : '💬 Blokir Komentar'}</button>
+                                <button class="btn-toggle-mini icon-btn ${canPost ? 'active' : ''}" title="${canPost ? 'Bisa Posting' : 'Izinkan Posting'}" onclick="toggleCanPost('${sId}', ${canPost})"><svg class="ic"><use href="#i-edit"></use></svg></button>
+                                <button class="btn-toggle-mini icon-btn ${commentBlocked ? 'danger-active' : ''}" title="${commentBlocked ? 'Komentar Diblokir' : 'Blokir Komentar'}" onclick="toggleCommentBlocked('${sId}', ${commentBlocked})"><svg class="ic"><use href="#i-mute"></use></svg></button>
                                 ${btnKeluarkan}
                             </div>
                         `;
@@ -3819,7 +3870,7 @@
                 invitedUsers.forEach(inv => {
                     let removeBtn = '';
                     if(currentUserData.role === 'guru' && currentClassData.teacherId === currentUserId) {
-                        removeBtn = `<button class="btn-hapus-announcement" style="padding:4px 8px;" onclick="batalUndang('${inv.uid}', '${inv.uname}')">Batal Undang</button>`;
+                        removeBtn = `<button class="btn-hapus-announcement icon-btn" title="Batal Undang" style="padding:4px 8px;" onclick="batalUndang('${inv.uid}', '${inv.uname}')"><svg class="ic"><use href="#i-close"></use></svg></button>`;
                     }
                     c.innerHTML += `
                         <div class="result-item" style="cursor:default; border-radius: var(--radius-md); margin-bottom:5px; background: var(--bg-color); opacity: 0.8;">
@@ -3989,7 +4040,7 @@
                 <div class="attach-file-item">
                     <span class="attach-file-item-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
                     <span class="attach-file-item-size">${formatFileSize(f.size)}</span>
-                    <button type="button" class="attach-file-item-remove" data-idx="${idx}" title="Hapus lampiran">✕</button>
+                    <button type="button" class="attach-file-item-remove icon-btn" data-idx="${idx}" title="Hapus lampiran"><svg class="ic"><use href="#i-close"></use></svg></button>
                 </div>
             `).join('');
             container.innerHTML = summary + items;
@@ -4013,7 +4064,7 @@
             if (!isTeacherOwner && !isClassContributor() && !studentCanPost) return await customAlert("Anda tidak memiliki izin untuk membuat pengumuman.");
 
             const btn = document.getElementById('btn-post-announcement');
-            btn.disabled = true; btn.innerText = "Posting...";
+            btn.disabled = true;
 
             // Buat referensi/ID materi dulu (sebelum menulis data) supaya file bisa diunggah
             // ke folder unik `{classId}/{annId}/...` dan tidak pernah tertukar dengan materi lain.
@@ -4043,7 +4094,7 @@
                     // Bersihkan file yang sempat berhasil terupload sebelum kegagalan, supaya tidak "nyangkut" di Storj
                     await Promise.all(filesData.map(fd => deleteAnnouncementFilesFromStorj(fd).catch(() => {})));
                     await customAlert("Gagal mengunggah file ke penyimpanan: " + (err.message || 'Terjadi kesalahan tak dikenal.') + "\n\nPengumuman tidak jadi diposting, silakan coba lagi.");
-                    btn.disabled = false; btn.innerText = "Posting";
+                    btn.disabled = false;
                     progressWrap.classList.add('hidden');
                     return;
                 }
@@ -4061,7 +4112,7 @@
             selectedAnnouncementFiles = [];
             document.getElementById('input-announcement-file').value = '';
             renderAttachFileList();
-            btn.disabled = false; btn.innerText = "Posting";
+            btn.disabled = false;
         });
 
         // Posting teks sederhana (tanpa lampiran) sebagai materi/pengumuman baru ke forum kelas.
@@ -4179,7 +4230,7 @@
             if (!lastTeamGenResult) return;
             if (!isCurrentUserClassTeacher()) return await customAlert("Anda tidak memiliki izin untuk memposting hasil ini.");
             const btn = document.getElementById('btn-post-team-result');
-            btn.disabled = true; btn.innerText = "Posting...";
+            btn.disabled = true;
             try {
                 await postSimpleTextAsAnnouncement(teamResultToText());
                 closeTeamResultModal();
@@ -4188,7 +4239,7 @@
                 console.error(err);
                 await customAlert("Gagal memposting hasil kelompok: " + (err.message || 'Terjadi kesalahan tak dikenal.'));
             }
-            btn.disabled = false; btn.innerText = "Posting";
+            btn.disabled = false;
         });
 
         // ================= RANDOM PICKER / RODA PUTAR (FITUR GURU) =================
@@ -4411,14 +4462,14 @@
                 <div class="attach-file-item is-existing">
                     <span class="attach-file-item-name" title="${escapeHtml(f.name || 'File')}">${escapeHtml(f.name || 'File')}</span>
                     <span class="attach-file-item-size">${formatFileSize(f.size)}</span>
-                    <button type="button" class="attach-file-item-remove" data-kind="existing" data-idx="${idx}" title="Hapus lampiran">✕</button>
+                    <button type="button" class="attach-file-item-remove icon-btn" data-kind="existing" data-idx="${idx}" title="Hapus lampiran"><svg class="ic"><use href="#i-close"></use></svg></button>
                 </div>
             `).join('');
             const newItems = editNewFiles.map((f, idx) => `
                 <div class="attach-file-item">
                     <span class="attach-file-item-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)} <span style="color:var(--success);">(baru)</span></span>
                     <span class="attach-file-item-size">${formatFileSize(f.size)}</span>
-                    <button type="button" class="attach-file-item-remove" data-kind="new" data-idx="${idx}" title="Hapus lampiran">✕</button>
+                    <button type="button" class="attach-file-item-remove icon-btn" data-kind="new" data-idx="${idx}" title="Hapus lampiran"><svg class="ic"><use href="#i-close"></use></svg></button>
                 </div>
             `).join('');
             container.innerHTML = summary + existingItems + newItems;
@@ -4467,7 +4518,7 @@
 
             const btn = document.getElementById('btn-simpan-edit');
             const btnAttach = document.getElementById('btn-edit-attach-file');
-            btn.disabled = true; btn.innerText = "Menyimpan...";
+            btn.disabled = true;
             btnAttach.disabled = true;
 
             // Upload dulu file-file BARU yang ditambahkan user selama sesi edit ini
@@ -4494,7 +4545,7 @@
                     // Bersihkan file baru yang sempat berhasil terupload sebelum kegagalan
                     await Promise.all(uploadedNewFiles.map(fd => deleteAnnouncementFilesFromStorj(fd).catch(() => {})));
                     await customAlert("Gagal mengunggah file baru: " + (err.message || 'Terjadi kesalahan tak dikenal.') + "\n\nPerubahan belum disimpan, silakan coba lagi.");
-                    btn.disabled = false; btn.innerText = "Simpan";
+                    btn.disabled = false;
                     btnAttach.disabled = false;
                     progressWrap.classList.add('hidden');
                     return;
@@ -4517,7 +4568,7 @@
             document.getElementById('edit-announcement-modal-overlay').classList.add('hidden');
             editingAnnouncementId = null;
             editExistingFiles = []; editRemovedFiles = []; editNewFiles = [];
-            btn.disabled = false; btn.innerText = "Simpan";
+            btn.disabled = false;
             btnAttach.disabled = false;
         });
 
@@ -5261,10 +5312,10 @@
             const commentsDisabled = !!data.commentsDisabled;
             const aiDisabled = !!data.aiDisabled;
 
-            const btnHapus = canManageThisAnn ? `<button class="btn-hapus-announcement" onclick="hapusPengumuman('${data.id}')">Hapus</button>` : '';
-            const btnPin = canManageThisAnn ? `<button class="btn-pin-announcement ${isPinned ? 'is-pinned' : ''}" onclick="togglePinItem('announcement', '${data.id}', ${isPinned})">📌 ${isPinned ? 'Lepas Sematkan' : 'Sematkan'}</button>` : '';
-            const btnToggleComments = canManageThisAnn ? `<button class="btn-toggle-mini ${commentsDisabled ? 'danger-active' : ''}" onclick="toggleCommentsDisabled('${data.id}', ${commentsDisabled})">${commentsDisabled ? '🔒 Komentar Nonaktif' : '💬 Nonaktifkan Komentar'}</button>` : '';
-            const btnToggleAi = canManageThisAnn ? `<button class="btn-toggle-mini ${aiDisabled ? 'danger-active' : ''}" title="Izinkan/larang materi ini ditanyakan siswa ke EduAI" onclick="toggleAiDisabled('${data.id}', ${aiDisabled})">${aiDisabled ? '🤖🚫 AI Nonaktif' : '🤖 Izinkan AI'}</button>` : '';
+            const btnHapus = canManageThisAnn ? `<button class="btn-hapus-announcement icon-btn" title="Hapus" onclick="hapusPengumuman('${data.id}')"><svg class="ic"><use href="#i-trash"></use></svg></button>` : '';
+            const btnPin = canManageThisAnn ? `<button class="btn-pin-announcement icon-btn ${isPinned ? 'is-pinned' : ''}" title="${isPinned ? 'Lepas Sematkan' : 'Sematkan'}" onclick="togglePinItem('announcement', '${data.id}', ${isPinned})"><svg class="ic"><use href="#i-pin"></use></svg></button>` : '';
+            const btnToggleComments = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${commentsDisabled ? 'danger-active' : ''}" title="${commentsDisabled ? 'Komentar Nonaktif' : 'Nonaktifkan Komentar'}" onclick="toggleCommentsDisabled('${data.id}', ${commentsDisabled})"><svg class="ic"><use href="#i-comment"></use></svg></button>` : '';
+            const btnToggleAi = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${aiDisabled ? 'danger-active' : ''}" title="Izinkan/larang materi ini ditanyakan siswa ke EduAI" onclick="toggleAiDisabled('${data.id}', ${aiDisabled})"><svg class="ic"><use href="#i-ai"></use></svg></button>` : '';
             const pinBadge = isPinned ? `<span class="pin-badge">📌 Disematkan</span>` : '';
 
             const rawTextForEdit = escapeForJsTemplate((data.text != null) ? String(data.text) : '');
@@ -5283,12 +5334,12 @@
                 <div class="announcement-card ${isPinned ? 'pinned' : ''}" data-ann-id="${data.id}">
                     <div class="announcement-header">
                         <div class="announcement-time">${pinBadge}<strong>${safeSender}</strong> • ${date}</div>
-                        <div class="announcement-header-actions">${btnPin}${btnToggleComments}${btnToggleAi}${btnHapus}<button class="ann-share-menu-btn" data-ann="${data.id}" title="Opsi lainnya">⋮</button></div>
+                        <div class="announcement-header-actions">${btnPin}${btnToggleComments}${btnToggleAi}${btnHapus}<button class="ann-share-menu-btn icon-btn" data-ann="${data.id}" title="Opsi lainnya"><svg class="ic"><use href="#i-dots"></use></svg></button></div>
                     </div>
                     <div class="announcement-text" ${clickAttr} style="${cursorStyle}">${safeText}</div>
                     ${fileHtml}
                     <div class="announcement-actions">
-                        <button class="btn-comment" data-ann="${data.id}">💬 Komentar (<span id="comment-count-${data.id}">${knownCount}</span>)</button>
+                        <button class="btn-comment icon-btn" title="Komentar" data-ann="${data.id}"><svg class="ic"><use href="#i-comment"></use></svg><span class="ic-badge" id="comment-count-${data.id}">${knownCount}</span></button>
                     </div>
                 </div>
             `;
@@ -5489,14 +5540,14 @@
             if (!editingCommentId) stashCommentComposerState(); // simpan draft/balasan lama sekali saja
             editingCommentId = id;
             document.getElementById('input-comment').value = text || '';
-            document.getElementById('btn-kirim-komentar').innerText = 'Simpan';
+            document.getElementById('btn-kirim-komentar').innerHTML = '<svg class="ic"><use href="#i-check"></use></svg>';
             showCommentEditIndicator();
             document.getElementById('input-comment').focus();
         }
 
         function exitCommentEditMode() {
             editingCommentId = null;
-            document.getElementById('btn-kirim-komentar').innerText = 'Kirim';
+            document.getElementById('btn-kirim-komentar').innerHTML = '<svg class="ic"><use href="#i-send"></use></svg>';
             hideCommentEditIndicator();
             restoreCommentComposerState();
         }
@@ -5511,7 +5562,7 @@
             commentPausedReplyId = null;
             commentPausedReplyName = null;
             hideCommentEditIndicator();
-            document.getElementById('btn-kirim-komentar').innerText = 'Kirim';
+            document.getElementById('btn-kirim-komentar').innerHTML = '<svg class="ic"><use href="#i-send"></use></svg>';
             document.getElementById('input-comment').value = '';
             document.getElementById('comment-modal-overlay').classList.remove('hidden');
             updateCommentInputState();
@@ -5583,7 +5634,7 @@
             const canPin = isRoot && canGuruManageTarget(c.senderId, c.senderRole);
             const isPinned = !!c.pinned;
             const showMenu = canEdit || canDelete || canPin;
-            const menuBtn = showMenu ? `<button class="comment-menu-btn" data-id="${c.id}" data-owner="${canEdit}" data-delete="${canDelete}" data-pin="${canPin}" data-pinned="${isPinned}">⋮</button>` : '';
+            const menuBtn = showMenu ? `<button class="comment-menu-btn icon-btn" data-id="${c.id}" data-owner="${canEdit}" data-delete="${canDelete}" data-pin="${canPin}" data-pinned="${isPinned}" title="Opsi komentar"><svg class="ic"><use href="#i-dots"></use></svg></button>` : '';
             const date = new Date(c.timestamp).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
             const editedTag = c.edited ? ' <span class="comment-edited-tag">(diedit)</span>' : '';
             const pinnedTag = isPinned ? `<span class="pin-badge-comment">📌 Disematkan</span>` : '';
@@ -5904,7 +5955,7 @@
             const box=document.getElementById('task-file-list');
             if (!selectedTaskFiles.length){ box.classList.add('hidden'); box.innerHTML=''; return; }
             box.classList.remove('hidden');
-            box.innerHTML=selectedTaskFiles.map((f,i)=>`<div class="attach-file-item"><span class="attach-file-item-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span><span class="attach-file-item-size">${formatFileSize(f.size)}</span><button class="attach-file-item-remove" onclick="removeSelectedTaskFile(${i})">×</button></div>`).join('');
+            box.innerHTML=selectedTaskFiles.map((f,i)=>`<div class="attach-file-item"><span class="attach-file-item-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span><span class="attach-file-item-size">${formatFileSize(f.size)}</span><button class="attach-file-item-remove icon-btn" title="Hapus file" onclick="removeSelectedTaskFile(${i})"><svg class="ic"><use href="#i-close"></use></svg></button></div>`).join('');
         }
         window.removeSelectedTaskFile=function(i){ selectedTaskFiles.splice(i,1); renderTaskSelectedFiles(); };
 
@@ -5953,7 +6004,7 @@
             const enabled=document.getElementById('task-deadline-toggle').checked;
             let deadlineAt=null;
             try{ deadlineAt=validateTaskDeadline(enabled,document.getElementById('input-task-deadline-date').value,document.getElementById('input-task-deadline-time').value); }catch(e){ return customAlert(e.message); }
-            const btn=document.getElementById('btn-post-task'); btn.disabled=true; btn.innerText='Posting...';
+            const btn=document.getElementById('btn-post-task'); btn.disabled=true;
             let taskId=null, uploaded=[];
             try{
                 const taskRef=push(ref(db,`tasks/${currentViewedClassId}`)); taskId=taskRef.key;
@@ -5963,7 +6014,7 @@
             }catch(e){
                 console.error(e); if(uploaded.length) await deleteAnnouncementFilesFromStorj(uploaded).catch(()=>{});
                 customAlert('Gagal membuat tugas: '+(e.message||'Terjadi kesalahan.'));
-            }finally{ document.getElementById('task-upload-progress').classList.add('hidden'); btn.disabled=false; btn.innerText='Posting'; }
+            }finally{ document.getElementById('task-upload-progress').classList.add('hidden'); btn.disabled=false; }
         });
 
         function renderTaskCard(id,data,submission){
@@ -5977,15 +6028,15 @@
             const fileHtml=files.length?`<div style="margin-top:12px;">${files.map(fd=>`<div style="font-size:12.5px;color:var(--text-muted);margin-top:5px;">📎 ${escapeHtml(fd.name||'File')}</div>`).join('')}</div>`:'';
             let actions='';
             if(!teacher){
-                if(submission){ actions+=`<button class="task-action-btn task-view-btn" onclick="event.stopPropagation();openTaskSubmission('${id}','view')">👁️ Lihat pekerjaan</button>`; }
-                else if(taskCanSubmit(data,null)) actions+=`<button class="task-action-btn task-submit-btn" onclick="event.stopPropagation();openTaskSubmission('${id}','new')">➕ Tambahkan unggahan</button>`;
+                if(submission){ actions+=`<button class="task-action-btn task-view-btn icon-btn" title="Lihat pekerjaan" onclick="event.stopPropagation();openTaskSubmission('${id}','view')"><svg class="ic"><use href="#i-eye"></use></svg></button>`; }
+                else if(taskCanSubmit(data,null)) actions+=`<button class="task-action-btn task-submit-btn icon-btn" title="Tambahkan unggahan" onclick="event.stopPropagation();openTaskSubmission('${id}','new')"><svg class="ic"><use href="#i-upload"></use></svg></button>`;
                 else actions+=`<span class="task-status late">🔒 Pengumpulan ditutup</span>`;
             } else {
-                actions=`<button class="task-action-btn task-view-btn" onclick="event.stopPropagation();openTaskSubmission('${id}','teacher')">👥 Lihat pengumpulan</button>`;
+                actions=`<button class="task-action-btn task-view-btn icon-btn" title="Lihat pengumpulan" onclick="event.stopPropagation();openTaskSubmission('${id}','teacher')"><svg class="ic"><use href="#i-people"></use></svg></button>`;
                 // Sematkan tugas ini opsional untuk guru — tugas sendiri sudah bisa dipantau
                 // lewat kalender di sidebar, jadi ini cuma untuk tugas yang memang mau
                 // ditonjolkan di forum kelas.
-                actions+=`<button class="task-action-btn btn-pin-announcement ${isPinned?'is-pinned':''}" onclick="event.stopPropagation();togglePinItem('task','${id}',${isPinned})">📌 ${isPinned?'Lepas Sematkan':'Sematkan'}</button>`;
+                actions+=`<button class="task-action-btn btn-pin-announcement icon-btn ${isPinned?'is-pinned':''}" title="${isPinned?'Lepas Sematkan':'Sematkan'}" onclick="event.stopPropagation();togglePinItem('task','${id}',${isPinned})"><svg class="ic"><use href="#i-pin"></use></svg></button>`;
             }
             const pinBadge=isPinned?`<span class="pin-badge">📌 Disematkan</span>`:'';
             const title=`${teacher?'':'📝 '}<span class="task-title-badge ${deadline?'deadline':''}">📝 TUGAS${deadline?' • DEADLINE':''}</span>`;
@@ -6016,7 +6067,7 @@
                 const grade = Number.isFinite(Number(sub.grade)) ? Number(sub.grade) : null;
                 document.getElementById('task-submission-info').innerText=`${task.senderName||'Guru'} • ${task.deadlineEnabled?`Deadline ${formatTaskDeadline(task.deadlineAt)}`:'Tanpa deadline'}${grade!==null?` • Nilai ${grade}/100`:' • Belum dinilai'}`;
                 const canEdit=taskCanSubmit(task,sub.submittedAt);
-                viewActions.innerHTML=canEdit ? `<button class="btn-buat" style="width:100%;" onclick="openTaskSubmission('${taskId}','edit')">✏️ Edit Pekerjaan</button>` : `<div style="width:100%;font-size:12px;color:var(--text-muted);text-align:center;">Pengeditan sudah ditutup setelah masa toleransi deadline.</div>`;
+                viewActions.innerHTML=canEdit ? `<button class="btn-buat icon-btn" title="Edit Pekerjaan" style="width:100%;" onclick="openTaskSubmission('${taskId}','edit')"><svg class="ic"><use href="#i-edit"></use></svg></button>` : `<div style="width:100%;font-size:12px;color:var(--text-muted);text-align:center;">Pengeditan sudah ditutup setelah masa toleransi deadline.</div>`;
                 renderExistingSubmissionReadOnly(sub); return;
             }
             if(!taskCanSubmit(task,sub&&sub.submittedAt)){
@@ -6028,7 +6079,7 @@
             uploadPanel.classList.remove('hidden');
             resetStudentDraft();
             if(sub){ window.currentTaskDraftFiles=(sub.files||[]).slice(); window.currentTaskDraftUrls=(sub.urls||[]).slice(); }
-            document.getElementById('btn-student-send-task').innerText=sub ? 'Simpan' : 'Kirim';
+            document.getElementById('btn-student-send-task').innerHTML = sub ? '<svg class="ic"><use href="#i-check"></use></svg>' : '<svg class="ic"><use href="#i-send"></use></svg>';
             renderStudentDrafts();
         }
         function renderExistingSubmissionReadOnly(sub){
@@ -6041,8 +6092,8 @@
         }
         function renderStudentDrafts(){
             const files=window.currentTaskDraftFiles||[], urls=window.currentTaskDraftUrls||[];
-            document.getElementById('student-task-file-list').innerHTML=files.map((fd,i)=>`<div class="task-preview-item"><div class="task-preview-thumb" id="draft-thumb-${i}"></div><div style="min-width:0;flex:1;"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(fd.name||'File')}</div><div style="font-size:11px;color:var(--text-muted);">${formatFileSize(fd.size||0)}</div></div><button class="remove" onclick="removeTaskDraftFile(${i})">×</button></div>`).join('');
-            document.getElementById('student-task-url-list').innerHTML=urls.map((u,i)=>`<div class="task-preview-item"><div style="font-size:18px;">🔗</div><a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="msg-link" style="flex:1;">${escapeHtml(u)}</a><button class="remove" onclick="removeTaskDraftUrl(${i})">×</button></div>`).join('');
+            document.getElementById('student-task-file-list').innerHTML=files.map((fd,i)=>`<div class="task-preview-item"><div class="task-preview-thumb" id="draft-thumb-${i}"></div><div style="min-width:0;flex:1;"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(fd.name||'File')}</div><div style="font-size:11px;color:var(--text-muted);">${formatFileSize(fd.size||0)}</div></div><button class="remove icon-btn" title="Hapus file" onclick="removeTaskDraftFile(${i})"><svg class="ic"><use href="#i-close"></use></svg></button></div>`).join('');
+            document.getElementById('student-task-url-list').innerHTML=urls.map((u,i)=>`<div class="task-preview-item"><div style="font-size:18px;"><svg class="ic" style="width:18px;height:18px;"><use href="#i-link"></use></svg></div><a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="msg-link" style="flex:1;">${escapeHtml(u)}</a><button class="remove icon-btn" title="Hapus URL" onclick="removeTaskDraftUrl(${i})"><svg class="ic"><use href="#i-close"></use></svg></button></div>`).join('');
             files.forEach(async(fd,i)=>{ if(!fd || !fd.name) return; try{const key=getObjectKeyOf(fd,'key','url'), thumb=getObjectKeyOf(fd,'thumbKey','thumbUrl'); const u=thumb?await getPresignedGetUrl(thumb,21600):((fd.type||'').startsWith('image/')&&key?await getPresignedGetUrl(key,21600):null); const el=document.getElementById('draft-thumb-'+i); if(el) el.innerHTML=u?`<img src="${u}">`:`<div style="font-size:20px;">📄</div>`;}catch(e){} });
         }
         window.removeTaskDraftFile=function(i){ window.currentTaskDraftFiles.splice(i,1); renderStudentDrafts(); };
@@ -6076,7 +6127,7 @@
             const files=window.currentTaskDraftFiles||[], urls=window.currentTaskDraftUrls||[];
             if(!files.length && !urls.length) return customAlert('Tambahkan minimal satu file atau URL.');
             if(!taskCanSubmit(task,null)) return customAlert('Pengumpulan sudah ditutup.');
-            const btn=document.getElementById('btn-student-send-task');btn.disabled=true;btn.innerText='Mengirim...';let newly=[];
+            const btn=document.getElementById('btn-student-send-task');btn.disabled=true;let newly=[];
             try{
                 const oldSnap=await get(ref(db,`taskSubmissions/${currentViewedClassId}/${currentTaskIdForSubmission}/${currentUserId}`));
                 const old=oldSnap.exists()?oldSnap.val():null;
@@ -6097,7 +6148,7 @@
                 if(newly.length) { try { /* uploaded objects cannot be identified if the RTDB write failed midway */ } catch(_) {} }
                 customAlert('Gagal mengirim tugas: '+(e.message||'Terjadi kesalahan.'));
             }
-            finally{btn.disabled=false;btn.innerText='Kirim';document.getElementById('student-task-progress').classList.add('hidden');}
+            finally{btn.disabled=false;document.getElementById('student-task-progress').classList.add('hidden');}
         });
 
         async function renderTeacherSubmissions(taskId){
@@ -6112,15 +6163,15 @@
                 const badge=sub?`<span class="task-status ${late?'late':'submitted'}">${late?'Terlambat':'Tepat waktu'}</span>`:'<span class="task-status pending">Belum dikumpulkan</span>';
                 const grade = sub && Number.isFinite(Number(sub.grade)) ? Number(sub.grade) : null;
                 const gradeValue = grade===null ? '' : String(grade);
-                const gradeControl = sub ? `<div class="task-grade-wrap"><input class="task-grade-input" id="task-grade-${e.uid}" type="number" min="0" max="100" step="0.01" value="${escapeHtml(gradeValue)}" placeholder="0"><span class="task-grade-suffix">/100</span><button class="task-action-btn task-grade-btn" onclick="saveTaskGrade('${taskId}','${e.uid}')">Nilai</button></div>` : '';
-                return `<div class="task-student-row"><div class="task-student-row-header"><div><div class="task-student-name">${escapeHtml(e.user.username||e.user.name||'Siswa')}</div><div class="task-student-meta">${sub?`Dikirim ${submitted}`:'Belum ada pengumpulan'}${sub&&late?' • melewati deadline':''}</div></div>${badge}</div>${sub?`<div class="task-student-row-actions"><button class="task-action-btn task-view-btn" onclick="openTeacherSingleSubmission('${taskId}','${e.uid}')">👁️ Lihat pekerjaan</button>${gradeControl}</div>`:''}</div>`;
+                const gradeControl = sub ? `<div class="task-grade-wrap"><input class="task-grade-input" id="task-grade-${e.uid}" type="number" min="0" max="100" step="0.01" value="${escapeHtml(gradeValue)}" placeholder="0"><span class="task-grade-suffix">/100</span><button class="task-action-btn task-grade-btn icon-btn" title="Nilai" onclick="saveTaskGrade('${taskId}','${e.uid}')"><svg class="ic"><use href="#i-check"></use></svg></button></div>` : '';
+                return `<div class="task-student-row"><div class="task-student-row-header"><div><div class="task-student-name">${escapeHtml(e.user.username||e.user.name||'Siswa')}</div><div class="task-student-meta">${sub?`Dikirim ${submitted}`:'Belum ada pengumpulan'}${sub&&late?' • melewati deadline':''}</div></div>${badge}</div>${sub?`<div class="task-student-row-actions"><button class="task-action-btn task-view-btn icon-btn" title="Lihat pekerjaan" onclick="openTeacherSingleSubmission('${taskId}','${e.uid}')"><svg class="ic"><use href="#i-eye"></use></svg></button>${gradeControl}</div>`:''}</div>`;
             }).join('');
         }
         window.saveTaskGrade=async function(taskId,uid){
             const input=document.getElementById(`task-grade-${uid}`); if(!input) return;
             const raw=input.value.trim(), num=Number(raw);
             if(raw==='' || !Number.isFinite(num) || num<0 || num>100) return customAlert('Nilai harus diisi antara 0 dan 100.');
-            const btn=input.parentElement.querySelector('.task-grade-btn'); if(btn){btn.disabled=true;btn.innerText='Menyimpan...';}
+            const btn=input.parentElement.querySelector('.task-grade-btn'); if(btn){btn.disabled=true;}
             try{
                 await update(ref(db,`taskSubmissions/${currentViewedClassId}/${taskId}/${uid}`),{grade:num});
                 await renderTeacherSubmissions(taskId);
@@ -6132,8 +6183,8 @@
             const task=currentTasksCache[taskId]; const snap=await get(ref(db,`taskSubmissions/${currentViewedClassId}/${taskId}/${uid}`)); if(!snap.exists()) return;
             const sub=snap.val(); currentTeacherSubmissionStudentId=uid;
             document.getElementById('teacher-task-submissions-panel').classList.add('hidden'); document.getElementById('teacher-single-submission-panel').classList.remove('hidden');
-            document.getElementById('teacher-single-submission-content').innerHTML=`<div class="task-student-name">${escapeHtml(sub.studentName||'Siswa')}</div><div class="task-student-meta">Dikirim ${new Date(sub.submittedAt).toLocaleString('id-ID',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})} • ${taskIsLate(task,sub.submittedAt)?'Terlambat':'Tepat waktu'}</div><div class="task-file-preview-list" id="teacher-sub-files"></div><div class="task-url-preview-list" id="teacher-sub-urls"></div><div class="modal-actions"><button class="btn-batal" onclick="backToTeacherSubmissions()">Kembali</button></div>`;
-            document.getElementById('teacher-sub-files').innerHTML=(sub.files||[]).map((fd,i)=>`<div class="task-preview-item"><div class="task-preview-thumb" id="teach-thumb-${i}"></div><div style="min-width:0;flex:1;"><div style="font-size:13px;font-weight:700;">${escapeHtml(fd.name||'File')}</div><div style="font-size:11px;color:var(--text-muted);">${formatFileSize(fd.size)}</div></div><button class="task-action-btn task-view-btn" onclick="openFileAttachmentByKey('${escapeForJsTemplate(getObjectKeyOf(fd,'key','url')||'')}','${escapeForJsTemplate(fd.type||'')}','${escapeForJsTemplate(fd.name||'File')}')">Buka</button></div>`).join('');
+            document.getElementById('teacher-single-submission-content').innerHTML=`<div class="task-student-name">${escapeHtml(sub.studentName||'Siswa')}</div><div class="task-student-meta">Dikirim ${new Date(sub.submittedAt).toLocaleString('id-ID',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})} • ${taskIsLate(task,sub.submittedAt)?'Terlambat':'Tepat waktu'}</div><div class="task-file-preview-list" id="teacher-sub-files"></div><div class="task-url-preview-list" id="teacher-sub-urls"></div><div class="modal-actions"><button class="btn-batal icon-btn" title="Kembali" onclick="backToTeacherSubmissions()"><svg class="ic"><use href="#i-chevron-left"></use></svg></button></div>`;
+            document.getElementById('teacher-sub-files').innerHTML=(sub.files||[]).map((fd,i)=>`<div class="task-preview-item"><div class="task-preview-thumb" id="teach-thumb-${i}"></div><div style="min-width:0;flex:1;"><div style="font-size:13px;font-weight:700;">${escapeHtml(fd.name||'File')}</div><div style="font-size:11px;color:var(--text-muted);">${formatFileSize(fd.size)}</div></div><button class="task-action-btn task-view-btn icon-btn" title="Buka" onclick="openFileAttachmentByKey('${escapeForJsTemplate(getObjectKeyOf(fd,'key','url')||'')}','${escapeForJsTemplate(fd.type||'')}','${escapeForJsTemplate(fd.name||'File')}')"><svg class="ic"><use href="#i-eye"></use></svg></button></div>`).join('');
             document.getElementById('teacher-sub-urls').innerHTML=(sub.urls||[]).map(u=>`<div class="task-preview-item"><div>🔗</div><a class="msg-link" href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer">${escapeHtml(u)}</a></div>`).join('');
             (sub.files||[]).forEach(async(fd,i)=>{try{const key=getObjectKeyOf(fd,'key','url'),thumb=getObjectKeyOf(fd,'thumbKey','thumbUrl');const u=thumb?await getPresignedGetUrl(thumb,21600):((fd.type||'').startsWith('image/')&&key?await getPresignedGetUrl(key,21600):null);const el=document.getElementById('teach-thumb-'+i);if(el)el.innerHTML=u?`<img src="${u}">`:`<div style="font-size:20px;">📄</div>`;}catch(e){}});
         };
@@ -6160,7 +6211,7 @@
         function renderEditTaskFiles(){
             const box=document.getElementById('edit-task-file-list'), total=editTaskExistingFiles.length+editTaskNewFiles.length;
             if(!total){box.classList.add('hidden');box.innerHTML='';return;} box.classList.remove('hidden');
-            box.innerHTML=[...editTaskExistingFiles.map((fd,i)=>`<div class="attach-file-item is-existing"><span class="attach-file-item-name">${escapeHtml(fd.name||'File')}</span><span class="attach-file-item-size">${formatFileSize(fd.size)}</span><button class="attach-file-item-remove" onclick="removeEditTaskExistingFile(${i})">×</button></div>`),...editTaskNewFiles.map((f,i)=>`<div class="attach-file-item"><span class="attach-file-item-name">${escapeHtml(f.name)}</span><span class="attach-file-item-size">${formatFileSize(f.size)}</span><button class="attach-file-item-remove" onclick="removeEditTaskNewFile(${i})">×</button></div>`)].join('');
+            box.innerHTML=[...editTaskExistingFiles.map((fd,i)=>`<div class="attach-file-item is-existing"><span class="attach-file-item-name">${escapeHtml(fd.name||'File')}</span><span class="attach-file-item-size">${formatFileSize(fd.size)}</span><button class="attach-file-item-remove icon-btn" title="Hapus file" onclick="removeEditTaskExistingFile(${i})"><svg class="ic"><use href="#i-close"></use></svg></button></div>`),...editTaskNewFiles.map((f,i)=>`<div class="attach-file-item"><span class="attach-file-item-name">${escapeHtml(f.name)}</span><span class="attach-file-item-size">${formatFileSize(f.size)}</span><button class="attach-file-item-remove icon-btn" title="Hapus file" onclick="removeEditTaskNewFile(${i})"><svg class="ic"><use href="#i-close"></use></svg></button></div>`)].join('');
         }
         window.removeEditTaskExistingFile=function(i){editTaskRemovedFiles.push(editTaskExistingFiles[i]);editTaskExistingFiles.splice(i,1);renderEditTaskFiles();};
         window.removeEditTaskNewFile=function(i){editTaskNewFiles.splice(i,1);renderEditTaskFiles();};
@@ -6172,7 +6223,7 @@
             if(!canEditTask(data)) return;
             const ok=await customConfirm('Hapus tugas ini beserta seluruh pekerjaan siswa yang sudah dikumpulkan? File terkait juga akan dihapus dari Storj.');
             if(!ok) return;
-            const btn=document.getElementById('btn-hapus-task'); btn.disabled=true; btn.innerText='Menghapus...';
+            const btn=document.getElementById('btn-hapus-task'); btn.disabled=true;
             try{
                 const subSnap=await get(ref(db,`taskSubmissions/${currentViewedClassId}/${id}`));
                 const filesToDelete=[...taskFilesArray(data)];
@@ -6184,14 +6235,14 @@
                 await renderClassTasks(currentViewedClassId);
                 refreshTaskCalendarData();
             }catch(e){ customAlert('Gagal menghapus tugas: '+(e.message||'Terjadi kesalahan.')); }
-            finally{ btn.disabled=false; btn.innerText='Hapus Tugas'; }
+            finally{ btn.disabled=false; }
         });
         document.getElementById('btn-simpan-edit-task').addEventListener('click',async()=>{
             const id=window.editingTaskId,data=currentTasksCache[id];if(!canEditTask(data))return;
             const text=document.getElementById('input-edit-task-description').value.trim();if(!text)return customAlert('Deskripsi tugas tidak boleh kosong.');
             let deadlineAt=null;try{deadlineAt=validateTaskDeadline(document.getElementById('edit-task-deadline-toggle').checked,document.getElementById('input-edit-task-deadline-date').value,document.getElementById('input-edit-task-deadline-time').value);}catch(e){return customAlert(e.message);}
-            const btn=document.getElementById('btn-simpan-edit-task');btn.disabled=true;btn.innerText='Menyimpan...';let uploaded=[];
-            try{if(editTaskNewFiles.length)uploaded=await uploadTaskFiles(editTaskNewFiles,id,()=>{});const finalFiles=[...editTaskExistingFiles,...uploaded];await update(ref(db,`tasks/${currentViewedClassId}/${id}`),{text,deadlineEnabled:document.getElementById('edit-task-deadline-toggle').checked,deadlineAt,files:finalFiles.length?finalFiles:null});if(editTaskRemovedFiles.length)await deleteAnnouncementFilesFromStorj(editTaskRemovedFiles);document.getElementById('task-edit-modal-overlay').classList.add('hidden');await renderClassTasks(currentViewedClassId);refreshTaskCalendarData();}catch(e){if(uploaded.length)deleteAnnouncementFilesFromStorj(uploaded);customAlert('Gagal menyimpan tugas: '+e.message);}finally{btn.disabled=false;btn.innerText='Simpan';}
+            const btn=document.getElementById('btn-simpan-edit-task');btn.disabled=true;let uploaded=[];
+            try{if(editTaskNewFiles.length)uploaded=await uploadTaskFiles(editTaskNewFiles,id,()=>{});const finalFiles=[...editTaskExistingFiles,...uploaded];await update(ref(db,`tasks/${currentViewedClassId}/${id}`),{text,deadlineEnabled:document.getElementById('edit-task-deadline-toggle').checked,deadlineAt,files:finalFiles.length?finalFiles:null});if(editTaskRemovedFiles.length)await deleteAnnouncementFilesFromStorj(editTaskRemovedFiles);document.getElementById('task-edit-modal-overlay').classList.add('hidden');await renderClassTasks(currentViewedClassId);refreshTaskCalendarData();}catch(e){if(uploaded.length)deleteAnnouncementFilesFromStorj(uploaded);customAlert('Gagal menyimpan tugas: '+e.message);}finally{btn.disabled=false;}
         });
 
         // Catatan: tugas TIDAK lagi dirender ke kontainer sendiri di atas forum. Tugas
