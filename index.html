@@ -3862,7 +3862,7 @@
                         actionsHtml = `
                             <div class="member-row-actions">
                                 <button class="btn-toggle-mini icon-btn ${canPost ? 'active' : ''}" title="${canPost ? 'Bisa Posting' : 'Izinkan Posting'}" onclick="toggleCanPost('${sId}', ${canPost})"><svg class="ic"><use href="#i-edit"></use></svg></button>
-                                <button class="btn-toggle-mini icon-btn ${commentBlocked ? 'danger-active' : ''}" title="${commentBlocked ? 'Komentar Diblokir' : 'Blokir Komentar'}" onclick="toggleCommentBlocked('${sId}', ${commentBlocked})"><svg class="ic"><use href="#i-mute"></use></svg></button>
+                                <button class="btn-toggle-mini icon-btn ${commentBlocked ? 'strike-off' : ''}" title="${commentBlocked ? 'Komentar Diblokir' : 'Blokir Komentar'}" onclick="toggleCommentBlocked('${sId}', ${commentBlocked})"><svg class="ic"><use href="#i-comment"></use></svg></button>
                                 ${btnKeluarkan}
                             </div>
                         `;
