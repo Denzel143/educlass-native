@@ -1081,6 +1081,7 @@
             <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2c-3.3 0-5.5 2.3-5.5 5.3 0 3.6 5.5 10.7 5.5 10.7s5.5-7.1 5.5-10.7C17.5 4.3 15.3 2 12 2z"/><circle cx="12" cy="7.3" r="2"/></symbol>
             <symbol id="i-share" viewBox="0 0 24 24"><path d="M3 11.5L21 3l-8.5 18-2-7.5L3 11.5z"/></symbol>
             <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4.3L6 21V3z"/></symbol>
+            <symbol id="i-thumbtack" viewBox="0 0 24 24"><circle class="ic-filled" cx="12" cy="7" r="5"/><path d="M12 12v9"/></symbol>
             <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5.5 5.5M21.5 9L16 14.5"/></symbol>
             <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></symbol>
             <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 017.8-1.5"/></symbol>
@@ -5322,7 +5323,7 @@
             const aiDisabled = !!data.aiDisabled;
 
             const btnHapus = canManageThisAnn ? `<button class="btn-hapus-announcement icon-btn" title="Hapus" onclick="hapusPengumuman('${data.id}')"><svg class="ic"><use href="#i-trash"></use></svg></button>` : '';
-            const btnPin = canManageThisAnn ? `<button class="btn-pin-announcement icon-btn ${isPinned ? 'is-pinned' : ''}" title="${isPinned ? 'Lepas Sematkan' : 'Sematkan'}" onclick="togglePinItem('announcement', '${data.id}', ${isPinned})"><svg class="ic"><use href="#i-bookmark"></use></svg></button>` : '';
+            const btnPin = canManageThisAnn ? `<button class="btn-pin-announcement icon-btn ${isPinned ? 'is-pinned' : ''}" title="${isPinned ? 'Lepas Sematkan' : 'Sematkan'}" onclick="togglePinItem('announcement', '${data.id}', ${isPinned})"><svg class="ic"><use href="#i-thumbtack"></use></svg></button>` : '';
             const btnToggleComments = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${commentsDisabled ? 'strike-off' : ''}" title="${commentsDisabled ? 'Komentar Nonaktif' : 'Nonaktifkan Komentar'}" onclick="toggleCommentsDisabled('${data.id}', ${commentsDisabled})"><svg class="ic"><use href="#i-comment"></use></svg></button>` : '';
             const btnToggleAi = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${aiDisabled ? 'strike-off' : ''}" title="Izinkan/larang materi ini ditanyakan siswa ke EduAI" onclick="toggleAiDisabled('${data.id}', ${aiDisabled})"><svg class="ic"><use href="#i-ai"></use></svg></button>` : '';
             const pinBadge = isPinned ? `<span class="pin-badge">📌 Disematkan</span>` : '';
@@ -6045,7 +6046,7 @@
                 // Sematkan tugas ini opsional untuk guru — tugas sendiri sudah bisa dipantau
                 // lewat kalender di sidebar, jadi ini cuma untuk tugas yang memang mau
                 // ditonjolkan di forum kelas.
-                actions+=`<button class="task-action-btn btn-pin-announcement icon-btn ${isPinned?'is-pinned':''}" title="${isPinned?'Lepas Sematkan':'Sematkan'}" onclick="event.stopPropagation();togglePinItem('task','${id}',${isPinned})"><svg class="ic"><use href="#i-bookmark"></use></svg></button>`;
+                actions+=`<button class="task-action-btn btn-pin-announcement icon-btn ${isPinned?'is-pinned':''}" title="${isPinned?'Lepas Sematkan':'Sematkan'}" onclick="event.stopPropagation();togglePinItem('task','${id}',${isPinned})"><svg class="ic"><use href="#i-thumbtack"></use></svg></button>`;
             }
             const pinBadge=isPinned?`<span class="pin-badge">📌 Disematkan</span>`:'';
             const title=`${teacher?'':'📝 '}<span class="task-title-badge ${deadline?'deadline':''}">📝 TUGAS${deadline?' • DEADLINE':''}</span>`;
