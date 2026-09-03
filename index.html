@@ -6289,20 +6289,17 @@
         //    (autocomplete @EduAI, kirim pesan pakai Enter, dsb) tetap jalan seperti biasa. Kalau kode
         //    lain di app mengubah value field asli lalu memanggil .focus() lagi, overlay ikut menyegarkan
         //    isinya dan fokus ditarik balik ke overlay.
-        //  - Composer baru dianggap "tampil" (overlay + latar gelap muncul) begitu viewport BENAR-BENAR
-        //    menyusut banyak (artinya keyboard virtual sungguh terbuka). Pakai keyboard eksternal atau di
-        //    komputer -> viewport tidak menyusut -> overlay ini tidak pernah muncul sama sekali, field
-        //    asli tetap dipakai apa adanya.
-        //  - Posisi overlay TETAP DIAM di tengah layar (agak naik) selama composer aktif — TIDAK pernah
-        //    mengikuti/menempel ke tinggi keyboard virtual. Kalau keyboard virtual ditutup rapi tapi
-        //    field masih fokus (composer belum ditutup sungguhan), overlay TIDAK ikut turun maupun
-        //    hilang, cukup diam di posisinya semula. Overlay baru benar-benar ditutup kalau fokus keluar
-        //    sungguhan dari sistem composer ini (tap ke latar gelap, atau pindah ke elemen lain di luar
-        //    overlay/field asli).
+        //  - Composer TAMPIL (overlay + latar gelap muncul) begitu SALAH SATU field yang eligible
+        //    difokus — TIDAK ada lagi deteksi "keyboard virtual benar-benar terbuka" lewat
+        //    visualViewport, karena event resize itu TIDAK reliable di WebView native (banyak WebView
+        //    Android tidak pernah memicu visualViewport.resize sama sekali tergantung
+        //    windowSoftInputMode-nya, sehingga composer bisa gagal muncul kalau masih mengandalkan itu).
+        //  - Composer DITUTUP kalau fokus benar-benar keluar dari sistem ini (tap latar gelap, atau
+        //    pindah ke elemen lain di luar overlay/field asli). Begitu composer ditutup, SEMUA kolom
+        //    input yang mungkin masih fokus (overlay field maupun field asli) dipaksa blur, supaya
+        //    keyboard virtual OS ikut tertutup dan tidak ada state fokus yang "menggantung".
+        //  - Posisi overlay TETAP DIAM di tengah layar (agak naik) selama composer aktif.
         (function initKeyboardComposer() {
-            const KB_SHRINK_THRESHOLD = 120; // px, ambang dianggap "keyboard virtual terbuka"
-            const vv = window.visualViewport;
-
             const scrim = document.createElement('div');
             scrim.className = 'kb-composer-scrim';
             document.body.appendChild(scrim);
@@ -6312,14 +6309,13 @@
             overlay.className = 'kb-composer-overlay';
             document.body.appendChild(overlay);
 
-            // Latar gelap cuma untuk menampung interaksi terkait keyboard virtual; tap di situ = tutup composer.
-            scrim.addEventListener('click', () => { if (overlayField) overlayField.blur(); });
+            // Tap di latar gelap = tutup composer & pastikan semua kolom input kehilangan fokus
+            // (supaya keyboard virtual OS ikut tertutup, bukan cuma overlay-nya yang disembunyikan).
+            scrim.addEventListener('click', () => { closeComposerAndBlurAll(); });
 
             let activeField = null;    // field ASLI, tetap di posisinya, tidak pernah dipindah
             let overlayField = null;   // elemen bersih di dalam overlay, disinkron dengan activeField
             let composerOpen = false;
-            let keyboardOpen = false;
-            let lastKbHeight = 0;
             let blurTimer = null;
 
             // ---- Popup saran "@EduAI" (lihat #eduai-suggest-popup di kolom obrolan) ----
@@ -6432,22 +6428,20 @@
                 overlay.innerHTML = '';
                 overlayField = null;
                 composerOpen = false;
-                keyboardOpen = false;
                 activeField = null;
             }
 
-            function onViewportChange() {
-                if (!vv || !activeField) return;
-                const kbHeight = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-                keyboardOpen = kbHeight > KB_SHRINK_THRESHOLD;
-                lastKbHeight = kbHeight;
-
-                if (keyboardOpen && !composerOpen) {
-                    // Keyboard virtual sungguh terbuka -> baru sekarang overlay bersih dimunculkan.
-                    // Posisinya sudah tetap (fixed, di tengah agak naik lewat CSS) dan TIDAK diubah lagi
-                    // setelah ini walau tinggi keyboard berubah-ubah atau keyboard ditutup rapi selagi
-                    // composer masih fokus — lihat komentar di awal initKeyboardComposer().
-                    activateComposer(activeField);
+            // Tutup composer SEKALIGUS pastikan tidak ada kolom input mana pun (overlay field ataupun
+            // field asli) yang masih menyandang fokus, supaya keyboard virtual OS benar-benar tertutup
+            // dan tidak ada state fokus "menggantung" yang bisa memicu composer terbuka lagi sendirinya.
+            function closeComposerAndBlurAll() {
+                const of = overlayField;
+                const af = activeField;
+                deactivateComposer();
+                if (of) of.blur();
+                if (af) af.blur();
+                if (document.activeElement && document.activeElement !== document.body && isEligibleField(document.activeElement)) {
+                    document.activeElement.blur();
                 }
             }
 
@@ -6465,12 +6459,11 @@
                         overlayField.focus({ preventScroll: true });
                     }
                 } else {
+                    // Field baru (atau berbeda) mendapat fokus -> LANGSUNG tampilkan composer, tanpa
+                    // menunggu/mengecek apakah keyboard virtual benar-benar terbuka.
                     activeField = el;
-                    if (composerOpen) activateComposer(el); // pindah ke field composer lain
+                    activateComposer(el);
                 }
-
-                requestAnimationFrame(onViewportChange);
-                setTimeout(onViewportChange, 350);
             });
 
             document.addEventListener('focusout', (e) => {
@@ -6482,13 +6475,6 @@
                     if (!stillInComposer) deactivateComposer();
                 }, 120);
             });
-
-            if (vv) {
-                vv.addEventListener('resize', onViewportChange);
-                vv.addEventListener('scroll', onViewportChange);
-            }
-            // Kalau visualViewport tidak didukung sama sekali (browser lama), overlay tidak pernah
-            // diaktifkan -> field asli berperilaku normal seperti sebelum perubahan ini (aman, tidak rusak).
         })();
     </script>
 </body>
