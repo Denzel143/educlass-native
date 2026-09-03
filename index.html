@@ -1686,8 +1686,15 @@
             // Diambil ULANG tiap kali dibutuhkan (bukan cuma sekali di awal) supaya overlay yang
             // baru ditambahkan ke DOM setelah load (mis. lewat innerHTML re-render) tetap ikut
             // terpantau, bukan cuma 20-an overlay yang sudah ada persis saat skrip ini pertama jalan.
+            // CATATAN: #kb-composer-overlay (composer sekunder utk kolom input) SENGAJA dikecualikan
+            // di sini. Id-nya kebetulan berakhiran "-overlay" juga, tapi elemen itu SELALU ada di DOM
+            // (tidak pernah diberi class "hidden", cuma opacity yang diubah), sehingga kalau ikut
+            // dihitung di sini, anyOverlayOpen() akan selalu bernilai true sejak halaman dimuat dan
+            // scroll body jadi terkunci permanen walau tidak ada modal/overlay lain yang benar-benar
+            // terbuka.
             function getOverlayEls() {
-                return Array.from(document.querySelectorAll('[id$="-overlay"]'));
+                return Array.from(document.querySelectorAll('[id$="-overlay"]'))
+                    .filter(el => el.id !== 'kb-composer-overlay');
             }
 
             // Cek dari CSS yang benar-benar dipakai browser (bukan cuma keberadaan class "hidden"),
@@ -2007,20 +2014,10 @@
         }
 
         window.addEventListener('popstate', async (e) => {
-            // Mengecek apakah user terjebak di trap dashboard
-            if (e.state && e.state.trap) {
-                // Restore state dashboard agar tidak merusak history jika user Batal keluar
-                history.pushState({ path: '/classroom/dashboard' }, '', '/classroom/dashboard');
-                
-                // Munculkan konfirmasi keluar
-                const confirmExit = await customConfirm("Apakah Anda yakin ingin keluar dari aplikasi EduClass?");
-                if (confirmExit) {
-                    // Paksa browser back 2 kali (melewati trap) agar benar-benar keluar web
-                    history.go(-2); 
-                }
-            } else {
-                resolveRoute();
-            }
+            // Kartu konfirmasi "Apakah Anda yakin ingin keluar dari aplikasi EduClass?" sudah
+            // dihilangkan sesuai permintaan — tombol back sekarang berjalan normal seperti web
+            // biasa, tanpa jebakan/konfirmasi apa pun.
+            resolveRoute();
         });
 
         // Klik logo EduClass untuk balik ke Beranda/Dashboard
