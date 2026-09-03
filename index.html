@@ -389,6 +389,13 @@
         @media (hover: hover) and (pointer: fine) { .btn-toggle-mini:hover { background: #E2E4E7; } }
         .btn-toggle-mini.active { background: var(--primary-light); color: var(--primary); }
         .btn-toggle-mini.danger-active { background: var(--danger-light); color: var(--danger); }
+        /* Nonaktif per-materi (komentar/AI): dicoret, bukan sekadar diblok merah */
+        .btn-toggle-mini.strike-off { background: #F1F3F4; color: var(--text-muted); position: relative; }
+        .btn-toggle-mini.strike-off .ic { opacity: 0.55; }
+        .btn-toggle-mini.strike-off::after {
+            content: ''; position: absolute; left: 12%; right: 12%; top: 50%; height: 2px;
+            background: var(--text-muted); transform: rotate(-38deg); border-radius: 2px;
+        }
         .member-row-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
 
         /* ================= LAMPIRAN FILE PADA PENGUMUMAN/MATERI ================= */
@@ -1367,10 +1374,10 @@
                 <div class="modal-card alert-card">
                     <h3 style="color: var(--primary); margin-top:0;">Menu Guru</h3>
                     <div class="modal-actions center" style="flex-direction: column; gap: 12px; margin-top:20px;">
-                        <button id="btn-choice-pengumuman" class="icon-btn btn-buat" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-megaphone"></use></svg></button>
-                        <button id="btn-choice-task" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-task"></use></svg></button>
-                        <button id="btn-choice-team-generator" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-dice"></use></svg></button>
-                        <button id="btn-choice-random-picker" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-wheel"></use></svg></button>
+                        <button id="btn-choice-pengumuman" class="icon-btn btn-buat" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-megaphone"></use></svg><span>Materi / Pengumuman</span></button>
+                        <button id="btn-choice-task" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-task"></use></svg><span>Tugas</span></button>
+                        <button id="btn-choice-team-generator" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-dice"></use></svg><span>Random Team Generator</span></button>
+                        <button id="btn-choice-random-picker" class="icon-btn btn-outline" style="width: 100%; padding:16px;"><svg class="ic"><use href="#i-wheel"></use></svg><span>Random Picker</span></button>
                         <button id="btn-choice-teacher-batal" class="icon-btn btn-batal" style="width: 100%; margin-top: 10px;"><svg class="ic"><use href="#i-close"></use></svg></button>
                     </div>
                 </div>
@@ -5314,8 +5321,8 @@
 
             const btnHapus = canManageThisAnn ? `<button class="btn-hapus-announcement icon-btn" title="Hapus" onclick="hapusPengumuman('${data.id}')"><svg class="ic"><use href="#i-trash"></use></svg></button>` : '';
             const btnPin = canManageThisAnn ? `<button class="btn-pin-announcement icon-btn ${isPinned ? 'is-pinned' : ''}" title="${isPinned ? 'Lepas Sematkan' : 'Sematkan'}" onclick="togglePinItem('announcement', '${data.id}', ${isPinned})"><svg class="ic"><use href="#i-pin"></use></svg></button>` : '';
-            const btnToggleComments = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${commentsDisabled ? 'danger-active' : ''}" title="${commentsDisabled ? 'Komentar Nonaktif' : 'Nonaktifkan Komentar'}" onclick="toggleCommentsDisabled('${data.id}', ${commentsDisabled})"><svg class="ic"><use href="#i-comment"></use></svg></button>` : '';
-            const btnToggleAi = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${aiDisabled ? 'danger-active' : ''}" title="Izinkan/larang materi ini ditanyakan siswa ke EduAI" onclick="toggleAiDisabled('${data.id}', ${aiDisabled})"><svg class="ic"><use href="#i-ai"></use></svg></button>` : '';
+            const btnToggleComments = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${commentsDisabled ? 'strike-off' : ''}" title="${commentsDisabled ? 'Komentar Nonaktif' : 'Nonaktifkan Komentar'}" onclick="toggleCommentsDisabled('${data.id}', ${commentsDisabled})"><svg class="ic"><use href="#i-comment"></use></svg></button>` : '';
+            const btnToggleAi = canManageThisAnn ? `<button class="btn-toggle-mini icon-btn ${aiDisabled ? 'strike-off' : ''}" title="Izinkan/larang materi ini ditanyakan siswa ke EduAI" onclick="toggleAiDisabled('${data.id}', ${aiDisabled})"><svg class="ic"><use href="#i-ai"></use></svg></button>` : '';
             const pinBadge = isPinned ? `<span class="pin-badge">📌 Disematkan</span>` : '';
 
             const rawTextForEdit = escapeForJsTemplate((data.text != null) ? String(data.text) : '');
@@ -6032,7 +6039,7 @@
                 else if(taskCanSubmit(data,null)) actions+=`<button class="task-action-btn task-submit-btn icon-btn" title="Tambahkan unggahan" onclick="event.stopPropagation();openTaskSubmission('${id}','new')"><svg class="ic"><use href="#i-upload"></use></svg></button>`;
                 else actions+=`<span class="task-status late">🔒 Pengumpulan ditutup</span>`;
             } else {
-                actions=`<button class="task-action-btn task-view-btn icon-btn" title="Lihat pengumpulan" onclick="event.stopPropagation();openTaskSubmission('${id}','teacher')"><svg class="ic"><use href="#i-people"></use></svg></button>`;
+                actions=`<button class="task-action-btn task-view-btn icon-btn" title="Lihat pengumpulan" onclick="event.stopPropagation();openTaskSubmission('${id}','teacher')"><svg class="ic"><use href="#i-task"></use></svg></button>`;
                 // Sematkan tugas ini opsional untuk guru — tugas sendiri sudah bisa dipantau
                 // lewat kalender di sidebar, jadi ini cuma untuk tugas yang memang mau
                 // ditonjolkan di forum kelas.
