@@ -747,6 +747,10 @@
             position: absolute; background: var(--surface); border-radius: var(--radius-sm);
             box-shadow: var(--shadow-floating); z-index: 2100; overflow: hidden; min-width: 140px;
         }
+        /* Menu komentar dipakai lintas modal (termasuk yang scroll-nya berbeda-beda),
+           jadi posisinya dihitung relatif terhadap viewport (bukan dokumen) agar tidak
+           pernah "melayang" jauh keluar layar. Lihat fungsi openCommentMenu(). */
+        #comment-menu-popup { position: fixed; }
         .comment-menu-item {
             padding: 12px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; gap: 8px; color: var(--text-main);
@@ -5732,11 +5736,21 @@
             pinItem.innerText = isPinned ? '📌 Lepas Sematkan' : '📌 Sematkan Komentar';
 
             const popup = document.getElementById('comment-menu-popup');
-            const rect = btnEl.getBoundingClientRect();
             popup.classList.remove('hidden');
-            let leftPos = rect.right + window.scrollX - popup.offsetWidth;
+            const rect = btnEl.getBoundingClientRect();
+            const popupW = popup.offsetWidth;
+            const popupH = popup.offsetHeight;
+            // Posisi dihitung terhadap viewport (popup pakai position:fixed), jadi tidak
+            // perlu ditambah window.scrollX/scrollY lagi — itulah yang bikin menu dulu
+            // bisa melayang jauh keluar layar.
+            let leftPos = rect.right - popupW;
             if (leftPos < 8) leftPos = 8;
-            popup.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+            if (leftPos + popupW > window.innerWidth - 8) leftPos = window.innerWidth - popupW - 8;
+            let topPos = rect.bottom + 6;
+            // Kalau tidak cukup ruang di bawah tombol, tampilkan menu di atas tombol saja
+            if (topPos + popupH > window.innerHeight - 8) topPos = rect.top - popupH - 6;
+            if (topPos < 8) topPos = 8;
+            popup.style.top = topPos + 'px';
             popup.style.left = leftPos + 'px';
         }
 
