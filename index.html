@@ -2097,6 +2097,7 @@
             document.getElementById('class-room-section').classList.add('hidden');
             
             document.getElementById(sectionId).classList.remove('hidden');
+            if (sectionId === 'class-room-section') window.scrollTo(0, 0);
             
             // Judul tab browser mengikuti laman yang sedang aktif. Untuk di dalam kelas,
             // judulnya diatur belakangan (lihat listener currentClassData) begitu nama
@@ -2447,6 +2448,11 @@
         function setupClassRoom(classId) {
             if (currentViewedClassId === classId) return;
             cleanupClassRoom();
+
+            // Selalu mulai dari paling atas saat masuk/pindah kelas. Tanpa ini, posisi
+            // scroll halaman sebelumnya (dashboard atau kelas lain) masih terbawa,
+            // jadi materi kelas baru kelihatan sudah kescroll setengah.
+            window.scrollTo(0, 0);
             
             currentViewedClassId = classId;
             document.getElementById('room-class-name').innerText = "Memuat data...";
